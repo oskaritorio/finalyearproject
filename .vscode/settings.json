@@ -1,0 +1,6 @@
+{
+    "docker.commands.build": "docker build --pull --rm -f \"${dockerfile}\" -t ${tag} \"${contextdir}\"",
+    "docker.commands.run": "docker run --rm -p 8000:8000 -v ${workspaceFolder}/backend:/app ${tag}",
+    "docker.containers.label": "ContainerName",
+    "docker.explorerRefreshInterval": 1000
+}
