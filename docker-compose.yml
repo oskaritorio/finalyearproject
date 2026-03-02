@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: mental-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+      - DEBUG=True
+    networks:
+      - mental-network
+    restart: unless-stopped
+
+networks:
+  mental-network:
+    driver: bridge
+    
