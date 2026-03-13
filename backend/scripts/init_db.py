@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-"""
-Initialize database tables - Simplified version
-"""
 import asyncio
 import sys
 import os
