@@ -6,4 +6,3 @@ pydantic==2.5.0
 python-dotenv==1.0.0
 
 echo "bcrypt==4.0.1" >> backend/requirements.txt
-echo "python-jose[cryptography]==3.3.0" >> backend/requirements.txt  # For JWT tokens
