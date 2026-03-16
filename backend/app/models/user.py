@@ -9,3 +9,15 @@ class User(Base):
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = Column(String(50), unique=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    #passwords - stored in hash not the real password
+
+    hashed_passoword = Column(String(200), nullable = False)
+
+    #user statuses in checking if running or not
+    is_active = Column(Boolean, deafult=True)
+    created_at = Column(DataTime, defualt=datetime.utcnow)
+    updated_at = Column(DataTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<User {self.username}>"

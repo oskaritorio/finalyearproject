@@ -5,7 +5,7 @@ from typing import List
 import uuid
 from datetime import datetime
 
-# Import our models and schemas
+#Import our models and schemas
 from app.models.base import get_db
 from app.models.journal import JournalEntry
 from app.schemas.journal import (
@@ -15,29 +15,29 @@ from app.schemas.journal import (
     JournalEntryList
 )
 
-# Create a router - this groups all journal-related endpoints
+#Create a router - this groups all journal-related endpoints
 router = APIRouter(
-    prefix="/journal",      # All endpoints will start with /journal
-    tags=["journal"],       # Groups them in Swagger UI
+    prefix="/journal",      #All endpoints will start with /journal
+    tags=["journal"],       #Groups them in Swagger UI
     responses={404: {"description": "Not found"}}  # Default error response
 )
 
-# 📝 CREATE a new journal entry
+#CREATE a new journal entry
 @router.post("/", 
              response_model=JournalEntryResponse,
              status_code=status.HTTP_201_CREATED,
              summary="Create a new journal entry",
              description="Saves a journal entry to the database")
 async def create_journal_entry(
-    entry: JournalEntryCreate,  # FastAPI automatically validates using this schema
+    entry: JournalEntryCreate,  #FastAPI automatically validates using this schema
     user_id: str = "test-user-id",  # TODO: Replace with real auth later
-    db: AsyncSession = Depends(get_db)  # Gets database session
+    db: AsyncSession = Depends(get_db)  #Gets database session
 ):
     
     try:
-        # Create a new database record
+        #Create a new database record
         db_entry = JournalEntry(
-            id=str(uuid.uuid4()),  # Generate unique ID
+            id=str(uuid.uuid4()),  #Generate unique ID
             user_id=user_id,
             encrypted_content=entry.encrypted_content,
             mood_score=entry.mood_score,
