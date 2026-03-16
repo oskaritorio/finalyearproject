@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from app.api import journal
+from app.api import journal, mood
 from app.auth import routes as auth_routes  # Add this line
 
 @asynccontextmanager
@@ -21,6 +21,7 @@ app = FastAPI(
 # Register routes
 app.include_router(auth_routes.router)  # Add this line
 app.include_router(journal.router)
+app.include_router(mood.router)
 
 @app.get("/")
 async def root():
