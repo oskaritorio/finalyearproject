@@ -1,235 +1,144 @@
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
-import uuid
+from sqlalchemy import select
+from pydantic import BaseModel
 from datetime import datetime
+import uuid
 
-#Import our models and schemas
 from app.models.base import get_db
 from app.models.journal import JournalEntry
-from app.schemas.journal import (
-    JournalEntryCreate,
-    JournalEntryResponse,
-    JournalEntryUpdate,
-    JournalEntryList
-)
+from app.auth.simple_auth import get_current_user
+from app.models.user import User
 
-#Create a router - this groups all journal-related endpoints
-router = APIRouter(
-    prefix="/journal",      #All endpoints will start with /journal
-    tags=["journal"],       #Groups them in Swagger UI
-    responses={404: {"description": "Not found"}}  # Default error response
-)
+router = APIRouter(prefix="/journal", tags=["journal"])
 
-#CREATE a new journal entry
-@router.post("/", 
-             response_model=JournalEntryResponse,
-             status_code=status.HTTP_201_CREATED,
-             summary="Create a new journal entry",
-             description="Saves a journal entry to the database")
-async def create_journal_entry(
-    entry: JournalEntryCreate,  #FastAPI automatically validates using this schema
-    user_id: str = "test-user-id",  # TODO: Replace with real auth later
-    db: AsyncSession = Depends(get_db)  #Gets database session
-):
-    
-    try:
-        #Create a new database record
-        db_entry = JournalEntry(
-            id=str(uuid.uuid4()),  #Generate unique ID
-            user_id=user_id,
-            encrypted_content=entry.encrypted_content,
-            mood_score=entry.mood_score,
-            tags=entry.tags,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
-        )
-        
-        # Add to database
-        db.add(db_entry)
-        await db.commit()  # Save changes
-        await db.refresh(db_entry)  # Get updated data (like created_at)
-        
-        return db_entry
-        
-    except Exception as e:
-        # If something goes wrong, undo any changes
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create journal entry: {str(e)}"
-        )
+# Simple request/response models (no separate schemas file needed!)
+class JournalCreate(BaseModel):
+    content: str  # Already encrypted by frontend
+    mood: int     # 1-5 scale
 
-# 📖 READ all journal entries for a user
-@router.get("/", 
-            response_model=JournalEntryList,
-            summary="Get all journal entries",
-            description="Returns all journal entries for the current user")
-async def get_journal_entries(
-    skip: int = 0,  # For pagination: how many to skip
-    limit: int = 100,  # For pagination: max number to return
-    user_id: str = "test-user-id",  # TODO: Replace with real auth
+class JournalResponse(BaseModel):
+    id: str
+    content: str
+    mood: int
+    created_at: datetime
+
+@router.post("/")
+async def create_journal(
+    journal: JournalCreate,
+    current_user: User = Depends(get_current_user),  # Gets logged-in user
     db: AsyncSession = Depends(get_db)
 ):
-   
+    """Create a journal entry for the logged-in user"""
     try:
-        from sqlalchemy import select, func
-        
-        # Count total entries for this user
-        count_query = select(func.count()).select_from(JournalEntry).where(
-            JournalEntry.user_id == user_id
+        entry = JournalEntry(
+            id=str(uuid.uuid4()),
+            user_id=current_user.id,  # Use REAL user ID from auth
+            encrypted_content=journal.content,
+            mood_score=journal.mood,
+            created_at=datetime.utcnow()
         )
-        total = await db.scalar(count_query)
         
-        # Get entries with pagination
-        query = select(JournalEntry).where(
-            JournalEntry.user_id == user_id
-        ).order_by(
-            JournalEntry.created_at.desc()  # Most recent first
-        ).offset(skip).limit(limit)
+        db.add(entry)
+        await db.commit()
         
-        result = await db.execute(query)
+        return {
+            "id": entry.id,
+            "content": entry.encrypted_content,
+            "mood": entry.mood_score,
+            "created_at": entry.created_at,
+            "message": "Journal entry saved!"
+        }
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/")
+async def get_my_journals(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get all journals for the logged-in user"""
+    try:
+        result = await db.execute(
+            select(JournalEntry)
+            .where(JournalEntry.user_id == current_user.id)
+            .order_by(JournalEntry.created_at.desc())
+        )
         entries = result.scalars().all()
         
         return {
-            "entries": entries,
-            "total": total or 0
+            "user": current_user.username,
+            "count": len(entries),
+            "entries": [
+                {
+                    "id": e.id,
+                    "content": e.encrypted_content,
+                    "mood": e.mood_score,
+                    "created_at": e.created_at
+                }
+                for e in entries
+            ]
         }
-        
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch journal entries: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-# 📖 READ a single journal entry by ID
-@router.get("/{entry_id}", 
-            response_model=JournalEntryResponse,
-            summary="Get a specific journal entry",
-            description="Returns a single journal entry by its ID")
-async def get_journal_entry(
+@router.get("/{entry_id}")
+async def get_one_journal(
     entry_id: str,
-    user_id: str = "test-user-id",  # TODO: Replace with real auth
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-   
+    """Get a specific journal entry"""
     try:
-        from sqlalchemy import select
-        
-        query = select(JournalEntry).where(
-            JournalEntry.id == entry_id,
-            JournalEntry.user_id == user_id  # Ensure user owns this entry
+        result = await db.execute(
+            select(JournalEntry).where(
+                JournalEntry.id == entry_id,
+                JournalEntry.user_id == current_user.id  # Ensure ownership
+            )
         )
-        result = await db.execute(query)
         entry = result.scalar_one_or_none()
         
         if not entry:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Journal entry not found"
-            )
+            raise HTTPException(status_code=404, detail="Entry not found")
         
-        return entry
-        
+        return {
+            "id": entry.id,
+            "content": entry.encrypted_content,
+            "mood": entry.mood_score,
+            "created_at": entry.created_at
+        }
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch journal entry: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-# ✏️ UPDATE a journal entry
-@router.patch("/{entry_id}", 
-              response_model=JournalEntryResponse,
-              summary="Update a journal entry",
-              description="Updates an existing journal entry")
-async def update_journal_entry(
+@router.delete("/{entry_id}")
+async def delete_journal(
     entry_id: str,
-    entry_update: JournalEntryUpdate,
-    user_id: str = "test-user-id",  # TODO: Replace with real auth
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    
+    """Delete a journal entry"""
     try:
-        from sqlalchemy import select
-        
-        # Find the entry
-        query = select(JournalEntry).where(
-            JournalEntry.id == entry_id,
-            JournalEntry.user_id == user_id
+        result = await db.execute(
+            select(JournalEntry).where(
+                JournalEntry.id == entry_id,
+                JournalEntry.user_id == current_user.id
+            )
         )
-        result = await db.execute(query)
         entry = result.scalar_one_or_none()
         
         if not entry:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Journal entry not found"
-            )
+            raise HTTPException(status_code=404, detail="Entry not found")
         
-        # Update only fields that were sent
-        update_data = entry_update.model_dump(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(entry, field, value)
-        
-        # Update timestamp
-        entry.updated_at = datetime.utcnow()
-        
-        await db.commit()
-        await db.refresh(entry)
-        
-        return entry
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update journal entry: {str(e)}"
-        )
-
-# 🗑️ DELETE a journal entry
-@router.delete("/{entry_id}", 
-               status_code=status.HTTP_204_NO_CONTENT,
-               summary="Delete a journal entry",
-               description="Deletes an existing journal entry")
-async def delete_journal_entry(
-    entry_id: str,
-    user_id: str = "test-user-id",  # TODO: Replace with real auth
-    db: AsyncSession = Depends(get_db)
-):
-   
-    try:
-        from sqlalchemy import select
-        
-        # Find the entry
-        query = select(JournalEntry).where(
-            JournalEntry.id == entry_id,
-            JournalEntry.user_id == user_id
-        )
-        result = await db.execute(query)
-        entry = result.scalar_one_or_none()
-        
-        if not entry:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Journal entry not found"
-            )
-        
-        # Delete it
         await db.delete(entry)
         await db.commit()
         
-        return None  # 204 No Content
-        
+        return {"message": "Entry deleted successfully"}
     except HTTPException:
         raise
     except Exception as e:
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete journal entry: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
