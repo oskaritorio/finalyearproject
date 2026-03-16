@@ -12,7 +12,7 @@ class User(Base):
 
     #passwords - stored in hash not the real password
 
-    passsword_hash = Column(String(200), nullable = False)
+    password_hash = Column(String(200), nullable = False)
 
  
     def __repr__(self):

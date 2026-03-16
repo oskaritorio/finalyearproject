@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -8,7 +7,7 @@ import uuid
 
 from app.models.base import get_db
 from app.models.journal import JournalEntry
-from app.auth.simple_auth import get_current_user
+from app.auth.auth import get_current_user
 from app.models.user import User
 
 router = APIRouter(prefix="/journal", tags=["journal"])
@@ -30,7 +29,6 @@ async def create_journal(
     current_user: User = Depends(get_current_user),  # Gets logged-in user
     db: AsyncSession = Depends(get_db)
 ):
-    """Create a journal entry for the logged-in user"""
     try:
         entry = JournalEntry(
             id=str(uuid.uuid4()),

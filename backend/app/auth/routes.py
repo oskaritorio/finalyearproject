@@ -7,7 +7,7 @@ import uuid
 
 from app.models.base import get_db
 from app.models.user import User
-from app.auth.simple_auth import hash_password
+from app.auth.auth import hash_password
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -59,8 +59,8 @@ async def login(
     request: LoginRequest,
     db: AsyncSession = Depends(get_db)
 ):
-    """Simple login check"""
-    from app.auth.simple_auth import verify_password
+    
+    from app.auth.auth import verify_password
     
     # Find user
     result = await db.execute(
