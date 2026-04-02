@@ -1,7 +1,7 @@
 import re
 import random
 
-class SimpleChat:
+class Chat:
     def __init__(self):
         self.crisis_words = [
             "kill myself", "end my life", "want to die", "suicide", "don't want to live",
