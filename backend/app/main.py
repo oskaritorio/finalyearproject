@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from app.api import journal, mood, chat
+from app.api import journal, mood, chat, user
 from app.auth import routes as auth_routes
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from app.models.base import engine, Base
@@ -23,6 +22,7 @@ app.include_router(auth_routes.router)
 app.include_router(journal.router)
 app.include_router(mood.router)
 app.include_router(chat.router)
+app.include_router(user.router)
 
 @app.get("/")
 async def root():
