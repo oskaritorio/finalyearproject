@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .header h1 {
+            color: #4A90D9;
+        }
+        .nav-links a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #4a5568;
+        }
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        .warning-banner {
+            background: #e53e3e;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            display: flex;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message.user .message-content {
+            background: #4A90D9;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border-bottom-right-radius: 5px;
+            max-width: 70%;
+        }
+        .message.bot .message-content {
+            background: #e2e8f0;
+            color: #2d3748;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            max-width: 70%;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+        }
+        .input-area button {
+            background: #4A90D9;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .crisis-alert {
+            background: #fee2e2;
+            border: 2px solid #e53e3e;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            color: #e53e3e;
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journal.html">Journal</a>
+                <a href="chat.html" style="font-weight: bold; color: #4A90D9;">Chat</a>
+                <a href="mood.html">Mood</a>
+                <a href="#" onclick="logout()" style="color: #e53e3e;">Logout</a>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="warning-banner">
+                🤖 Supportive conversation • Not a crisis service
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">Hello! I'm here to listen. How are you feeling today?</div>
+                </div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your message...">
+                <button id="sendBtn">Send</button>
+            </div>
+            <div id="crisisAlert" class="crisis-alert hidden">
+                🆘 If you're in crisis, please reach out:<br>
+                📞 Samaritans: 116 123 (free, 24/7)<br>
+                📞 NHS 111: 111<br>
+                📞 SHOUT: Text 85258
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        function getAuth() {
+            const auth = localStorage.getItem('auth');
+            return auth ? { 'Authorization': `Basic ${auth}` } : {};
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showCrisisAlert() {
+            document.getElementById('crisisAlert').classList.remove('hidden');
+        }
+        
+        function hideCrisisAlert() {
+            document.getElementById('crisisAlert').classList.add('hidden');
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            try {
+                const response = await fetch(`${API_URL}/chat/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuth()
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.reply, 'bot');
+                    
+                    // Check for crisis detection
+                    if (data.category === 'CRISIS' || data.crisis_help) {
+                        showCrisisAlert();
+                    } else {
+                        hideCrisisAlert();
+                    }
+                } else if (response.status === 401) {
+                    addMessage('Session expired. Please login again.', 'bot');
+                    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                } else {
+                    addMessage('Sorry, I had trouble responding. Please try again.', 'bot');
+                }
+            } catch (error) {
+                console.error('Chat error:', error);
+                addMessage('Cannot connect to server. Is the backend running?', 'bot');
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        // Check login
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Setup event listeners
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>

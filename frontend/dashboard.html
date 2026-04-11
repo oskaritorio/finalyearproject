@@ -4,71 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MuseChum - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        .welcome-card {
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 32px;
-        }
-        h1 {
-            color: #4A90D9;
-            margin-bottom: 20px;
-        }
-        .welcome {
-            background: #e8f0fe;
-            padding: 20px;
-            border-radius: 16px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
-        .logout-btn {
-            color: #e53e3e;
-            cursor: pointer;
-            float: right;
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+        
+        .quick-link-card {
+            background: white;
+            padding: 24px;
+            text-align: center;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #2d3748;
+            transition: transform 0.2s;
+        }
+        
+        .quick-link-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .quick-link-card .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📓 MuseChum <span class="logout-btn" onclick="logout()">Logout</span></h1>
-        
-        <div class="welcome">
-            <h2>Welcome back, <span id="username"></span>!</h2>
-            <p>✅ You are successfully logged in!</p>
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="journal.html">Journal</a>
+                <a href="chat.html">Chat</a>
+                <a href="mood.html">Mood</a>
+                <a href="#" class="logout-link" onclick="logout()">Logout</a>
+            </div>
         </div>
         
-        <p style="text-align: center; color: #718096;">
-            Next: We'll add Journal, Chat, and Mood features here
-        </p>
+        <div class="welcome-card">
+            <h2>Welcome back, <span id="username"></span>! 👋</h2>
+            <p>Your private space for wellbeing</p>
+        </div>
+        
+        <div class="quick-links">
+            <a href="journal.html" class="quick-link-card">
+                <span class="icon">📝</span>
+                <h3>Journal</h3>
+                <p>Write your thoughts</p>
+            </a>
+            <a href="chat.html" class="quick-link-card">
+                <span class="icon">💬</span>
+                <h3>Chat</h3>
+                <p>Talk to AI companion</p>
+            </a>
+            <a href="mood.html" class="quick-link-card">
+                <span class="icon">😊</span>
+                <h3>Mood</h3>
+                <p>Track your feelings</p>
+            </a>
+        </div>
     </div>
-
+    
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        // Check if logged in
-        const user = localStorage.getItem('user');
-        if (!user) {
-            window.location.href = 'index.html';
-        }
+        if (!isLoggedIn()) window.location.href = 'index.html';
         
-        // Display username
-        const userData = JSON.parse(user);
-        document.getElementById('username').textContent = userData.username;
-        
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
+        const user = getCurrentUser();
+        if (user) document.getElementById('username').textContent = user.username;
     </script>
 </body>
 </html>

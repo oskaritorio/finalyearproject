@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Mood History</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .mood-stats {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .average-mood {
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        
+        .mood-list {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+        }
+        
+        .mood-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .mood-emoji-large {
+            font-size: 32px;
+        }
+        
+        .quick-mood {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .quick-mood-btn {
+            font-size: 40px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .quick-mood-btn:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journal.html">Journal</a>
+                <a href="chat.html">Chat</a>
+                <a href="mood.html" class="active">Mood</a>
+                <a href="#" class="logout-link" onclick="logout()">Logout</a>
+            </div>
+        </div>
+
+        <!-- Quick Mood Check-in -->
+        <div class="mood-stats">
+            <h2>😊 How are you feeling right now?</h2>
+            <div class="quick-mood">
+                <span class="quick-mood-btn" onclick="quickMood(1)">😢</span>
+                <span class="quick-mood-btn" onclick="quickMood(2)">😐</span>
+                <span class="quick-mood-btn" onclick="quickMood(3)">🙂</span>
+                <span class="quick-mood-btn" onclick="quickMood(4)">😊</span>
+                <span class="quick-mood-btn" onclick="quickMood(5)">🤗</span>
+            </div>
+        </div>
+
+        <!-- Mood Statistics -->
+        <div class="mood-stats">
+            <h2>📊 Your Mood Overview</h2>
+            <div class="average-mood" id="averageMood">--</div>
+            <div id="moodCount">0 entries</div>
+        </div>
+
+        <!-- Mood History -->
+        <div class="mood-list">
+            <h2>📅 Recent Moods</h2>
+            <div id="moodHistoryContainer">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/mood.js"></script>
+    
+    <script>
+        initMood();
+    </script>
+</body>
+</html>
