@@ -4,117 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MuseChum - Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .header {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .header h1 {
-            color: #4A90D9;
-        }
-        .nav-links a {
-            margin-left: 20px;
-            text-decoration: none;
-            color: #4a5568;
-        }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #4A90D9;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 14px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-
-        .toast.error {
-            background : #e53e3e;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opactiy: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            font-family: inherit;
-            margin: 10px 0;
-        }
-        button {
-            background: #4A90D9;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-        }
+        /* Only journal-specific styles that aren't in style.css */
         .entry {
-            border-bottom: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 10px;
+            border-bottom: 1px solid #F0E6D6;
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            border-radius: 20px;
+        }
+        .entry:hover {
+            background: rgba(156, 175, 136, 0.05);
+            transform: translateX(4px);
         }
         .entry-mood {
-            font-size: 24px;
+            font-size: 28px;
         }
         .entry-date {
-            color: #718096;
+            color: var(--text-light);
             font-size: 12px;
         }
         .delete-btn {
-            color: #e53e3e;
+            color: var(--accent-terracotta);
             cursor: pointer;
             font-size: 12px;
-            margin-left: 10px;
+            margin-left: 12px;
+            transition: all 0.2s ease;
         }
-        .mood-selector {
-            display: flex;
-            gap: 15px;
-            margin: 10px 0;
-        }
-        .mood-option {
-            font-size: 30px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        .mood-option.selected {
-            background: #e2e8f0;
-            border-radius: 50%;
+        .delete-btn:hover {
+            color: #C2786B;
+            transform: scale(1.05);
         }
     </style>
 </head>

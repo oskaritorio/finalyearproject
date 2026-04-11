@@ -9,18 +9,16 @@ from app.models.base import get_db
 from app.models.chat import ChatSession, Message
 from app.models.user import User
 from app.auth.auth import get_current_user
-from app.services.chatguide import Chat
+from app.services.chatguide import Chat 
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-#creates a chatbot instance
-chatbot = Chat()
+# Create chatbot instance
+chatbot = Chat()  # Change to your class name
 
-#user input to the chatbot
 class ChatRequest(BaseModel):
     message: str
 
-#chatbot responds with
 class ChatResponse(BaseModel):
     reply: str
     category: str
@@ -32,9 +30,7 @@ async def chat(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """🤖 Send message to chatbot with memory"""
-    
-    # Find or create chat session
+    # Find or create session
     result = await db.execute(
         select(ChatSession)
         .where(ChatSession.user_id == current_user.id)
@@ -47,32 +43,73 @@ async def chat(
         db.add(session)
         await db.flush()
     
-    # Get last 3 messages for memory
+    # Get last 5 messages for context
     msg_result = await db.execute(
         select(Message)
         .where(Message.session_id == session.id)
         .order_by(Message.timestamp.desc())
-        .limit(3)
+        .limit(5)
     )
     last_msgs = msg_result.scalars().all()
-    
-    # Build context list
     context = [{"sender": m.sender, "content": m.content} for m in reversed(last_msgs)]
     
     # Save user message
-    user_msg = Message(id=str(uuid.uuid4()), session_id=session.id, sender="user", content=request.message)
+    user_msg = Message(
+        id=str(uuid.uuid4()),
+        session_id=session.id,
+        sender="user",
+        content=request.message
+    )
     db.add(user_msg)
     
-    # Get reply with memory
-    reply_text, category, crisis_help = chatbot.get_reply_with_memory(request.message, context)
+    # Get bot reply
+    reply_text, category, crisis_help = chatbot.get_reply(request.message, context)
     
     if category == "CRISIS":
         session.crisis_detected = True
     
     # Save bot reply
-    bot_msg = Message(id=str(uuid.uuid4()), session_id=session.id, sender="bot", content=reply_text)
+    bot_msg = Message(
+        id=str(uuid.uuid4()),
+        session_id=session.id,
+        sender="bot",
+        content=reply_text
+    )
     db.add(bot_msg)
     
     await db.commit()
     
-    return {"reply": reply_text, "category": category, "crisis_help": crisis_help}
+    return {
+        "reply": reply_text,
+        "category": category,
+        "crisis_help": crisis_help
+    }
+
+@router.get("/history")
+async def get_history(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(ChatSession)
+        .where(ChatSession.user_id == current_user.id)
+        .order_by(ChatSession.started_at.desc())
+    )
+    sessions = result.scalars().all()
+    
+    history = []
+    for s in sessions:
+        msg_result = await db.execute(
+            select(Message)
+            .where(Message.session_id == s.id)
+            .order_by(Message.timestamp)
+        )
+        msgs = msg_result.scalars().all()
+        history.append({
+            "session_id": s.id,
+            "started_at": s.started_at,
+            "crisis_detected": s.crisis_detected,
+            "messages": [{"sender": m.sender, "content": m.content, "timestamp": m.timestamp} for m in msgs]
+        })
+    
+    return {"sessions": history}
