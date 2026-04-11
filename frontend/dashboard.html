@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header>
+            <h1>MuseChum</h1>
+            <div class="quote-box">
+                <p class="quote-text">"If you do what you love, it is the best way to relax."</p>
+                <p class="quote-author">- Christian Louboutin</p>
+            </div>
+        </header>
+
+        
+        <section class="mood-section">
+            <h3>How are you feeling today?</h3>
+            <div class="mood-emoji-row">
+                <span class="mood-emoji" data-mood="1">😢</span>
+                <span class="mood-emoji" data-mood="2">😐</span>
+                <span class="mood-emoji" data-mood="3">🙂</span>
+                <span class="mood-emoji" data-mood="4">😊</span>
+                <span class="mood-emoji" data-mood="5">🤗</span>
+            </div>
+        </section>
+
+        
+        <section class="chat-preview">
+            <div class="section-header">
+                <h3>AI ChatBot</h3>
+                <small>Supportive conversation • Not a crisis service</small>
+            </div>
+            <div class="chat-bubbles">
+                <div class="user-bubble">I've been so stressed about my deadlines</div>
+                <div class="bot-bubble">Sounds real tough, would it help breaking down what's worrying you the most?</div>
+                <div class="user-bubble">I just can't focus</div>
+            </div>
+            <button class="btn-chat" onclick="window.location.href='chat.html'">Open Chat →</button>
+        </section>
+
+        <!-- Journal Entry Section -->
+        <section class="journal-section">
+            <h3>📝 Journal Entry</h3>
+            <div class="journal-mood-row">
+                <span>How are you feeling?</span>
+                <div class="mood-emoji-row small">
+                    <span class="mood-emoji" data-mood="1">😢</span>
+                    <span class="mood-emoji" data-mood="2">😐</span>
+                    <span class="mood-emoji" data-mood="3">🙂</span>
+                    <span class="mood-emoji" data-mood="4">😊</span>
+                    <span class="mood-emoji" data-mood="5">🤗</span>
+                </div>
+                <span class="selected-mood">Selected: Sad</span>
+            </div>
+            <textarea placeholder="Write your journal entry here..." rows="4"></textarea>
+            <div class="tag-row">
+                <span class="tag">work</span>
+                <span class="tag">family</span>
+                <span class="tag">health</span>
+                <span class="tag-add">+</span>
+            </div>
+            <button class="btn-save" onclick="saveJournal()">Save Entry</button>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <div class="action-card" onclick="window.location.href='journal.html'">📝 Journal</div>
+            <div class="action-card" onclick="window.location.href='chat.html'">💬 Chat</div>
+            <div class="action-card" onclick="window.location.href='mood.html'">📊 Mood & Insights</div>
+        </section>
+
+        <!-- Privacy Footer -->
+        <footer>
+            <p>🔒 Saved to your device • End-to-end encrypted</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if logged in
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
