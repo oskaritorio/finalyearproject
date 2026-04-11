@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 from app.api import journal, mood, chat, user
 from app.auth import routes as auth_routes
@@ -16,6 +18,15 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"], 
+)
+
 
 # Register routes
 app.include_router(auth_routes.router)
