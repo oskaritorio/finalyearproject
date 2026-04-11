@@ -1,102 +1,239 @@
+/* ========================================
+   MUSE CHUM - GLOBAL STYLES
+   ======================================== */
 
-/* Reset default browser styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body styling */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: #f0f2f5;
     padding: 20px;
 }
 
-/* Login container */
-.login-container {
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ========================================
+   HEADER & NAVIGATION
+   ======================================== */
+.header {
     background: white;
-    border-radius: 24px;
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Logo/title */
-.login-container h1 {
-    font-size: 32px;
+.header h1 {
     color: #4A90D9;
-    margin-bottom: 8px;
+    font-size: 24px;
 }
 
-/* Subtitle */
-.subtitle {
-    color: #718096;
-    margin-bottom: 32px;
-    font-size: 14px;
+.nav-links a {
+    color: #4a5568;
+    text-decoration: none;
+    margin-left: 20px;
 }
 
-/* Input fields */
-.login-container input {
+.nav-links a.active {
+    color: #4A90D9;
+    font-weight: bold;
+}
+
+.logout-link {
+    color: #e53e3e !important;
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+.create-card, .entries-list {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.create-card h2, .entries-header h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: #2d3748;
+}
+
+/* ========================================
+   MOOD SELECTOR
+   ======================================== */
+.mood-selector {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.mood-option {
+    font-size: 28px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.mood-option:hover {
+    transform: scale(1.2);
+}
+
+.mood-option.selected {
+    background: #e2e8f0;
+}
+
+/* ========================================
+   FORMS & BUTTONS
+   ======================================== */
+textarea {
     width: 100%;
     padding: 14px;
-    margin: 10px 0;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 16px;
-    transition: border 0.2s;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 16px;
 }
 
-.login-container input:focus {
+textarea:focus {
     outline: none;
     border-color: #4A90D9;
 }
 
-/* Login button */
-.login-container button {
+.save-btn {
     background: #4A90D9;
     color: white;
     border: none;
-    padding: 14px;
+    padding: 12px 24px;
     border-radius: 30px;
     font-size: 16px;
-    font-weight: 600;
+    cursor: pointer;
     width: 100%;
-    margin-top: 20px;
+}
+
+.save-btn:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   ENTRIES LIST
+   ======================================== */
+.entries-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.entry-card {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px;
     cursor: pointer;
     transition: background 0.2s;
 }
 
-.login-container button:hover {
-    background: #3a7bc8;
+.entry-card:hover {
+    background: #f7fafc;
 }
 
-/* Error message */
-.error-message {
-    color: #e53e3e;
-    margin: 10px 0;
-    font-size: 14px;
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-/* Register link */
-.register-link {
-    margin-top: 24px;
+.entry-mood {
+    font-size: 24px;
+}
+
+.entry-date {
+    font-size: 12px;
     color: #718096;
+}
+
+.entry-preview {
+    color: #4a5568;
     font-size: 14px;
+    margin-top: 8px;
 }
 
-.register-link a {
+.entry-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.edit-btn {
     color: #4A90D9;
-    text-decoration: none;
+    cursor: pointer;
+    font-size: 12px;
 }
 
-/* Utility classes */
+.delete-btn {
+    color: #e53e3e;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-content h3 {
+    margin-bottom: 16px;
+}
+
+.close-modal {
+    float: right;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+/* ========================================
+   STATES
+   ======================================== */
+.empty-state, .loading {
+    text-align: center;
+    padding: 40px;
+    color: #718096;
+}
+
 .hidden {
     display: none;
 }

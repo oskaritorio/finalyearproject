@@ -30,9 +30,8 @@ async function login(username, password) {
 
 // Logout function
 function logout() {
-    localStorage.removeItem('user');
-    localStorage.removeItem('auth');
-    window.location.href = '/';
+    localStorage.clear();
+    window.location.href = 'index.html';
 }
 
 // Check if user is logged in

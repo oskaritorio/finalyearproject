@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Journal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journal.html" class="active">Journal</a>
+                <a href="chat.html">Chat</a>
+                <a href="#" class="logout-link" onclick="logout()">Logout</a>
+            </div>
+        </div>
+
+        <!-- Create New Entry -->
+        <div class="create-card">
+            <h2>✍️ Write New Entry</h2>
+            <div class="mood-selector" id="moodSelector">
+                <span class="mood-option" data-mood="1">😢</span>
+                <span class="mood-option" data-mood="2">😐</span>
+                <span class="mood-option" data-mood="3">🙂</span>
+                <span class="mood-option" data-mood="4">😊</span>
+                <span class="mood-option" data-mood="5">🤗</span>
+            </div>
+            <textarea id="newEntryContent" rows="4" placeholder="What's on your mind today?"></textarea>
+            <button class="save-btn" id="saveBtn" onclick="createEntry()">Save Entry</button>
+        </div>
+
+        <!-- Entries List -->
+        <div class="entries-list">
+            <div class="entries-header">
+                <h2>📖 Previous Entries</h2>
+                <span id="entryCount">0 entries</span>
+            </div>
+            <div id="entriesContainer">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3>Edit Journal Entry</h3>
+            <div class="mood-selector" id="editMoodSelector">
+                <span class="mood-option" data-mood="1">😢</span>
+                <span class="mood-option" data-mood="2">😐</span>
+                <span class="mood-option" data-mood="3">🙂</span>
+                <span class="mood-option" data-mood="4">😊</span>
+                <span class="mood-option" data-mood="5">🤗</span>
+            </div>
+            <textarea id="editContent" rows="4" style="width: 100%; margin: 16px 0;"></textarea>
+            <button class="save-btn" onclick="updateEntry()">Update Entry</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/journal.js"></script>
+    
+    <script>
+        // Initialize the page
+        initJournal();
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
