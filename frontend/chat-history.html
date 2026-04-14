@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Chat History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .chat-history-container {
+            background: var(--card-warm);
+            border-radius: 24px;
+            padding: 24px;
+        }
+        .session-card {
+            border: 1px solid #F0E6D6;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .session-date {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        .crisis-badge {
+            background: #E8A598;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .session-preview {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .session-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .session-actions button {
+            padding: 6px 16px;
+            font-size: 12px;
+        }
+        .btn-export {
+            background: #9CAF88;
+        }
+        .btn-delete-session {
+            background: #E8A598;
+        }
+        .btn-delete-all {
+            background: #E53E3E;
+            margin-bottom: 20px;
+        }
+        .export-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .export-options select {
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid #F0E6D6;
+            background: white;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-sage);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journal.html">Journal</a>
+                <a href="chat.html">Chat</a>
+                <a href="mood.html">Mood</a>
+                <a href="settings.html">Settings</a>
+                <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
+            </div>
+        </div>
+
+        <div class="chat-history-container">
+            <a href="settings.html" class="back-link">← Back to Settings</a>
+            
+            <h2>💬 Chat History</h2>
+            
+            <div class="export-options">
+                <select id="exportFormat">
+                    <option value="txt">TXT Format (Human readable)</option>
+                    <option value="json">JSON Format (Data analysis)</option>
+                </select>
+                <button id="exportAllBtn" class="btn-export">Export All Chats</button>
+                <button id="deleteAllBtn" class="btn-delete-all">Delete All Chat History</button>
+            </div>
+            
+            <div id="sessionsList">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Delete Session Modal -->
+    <div id="deleteSessionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Delete Session</h3>
+            <p>Are you sure you want to delete this conversation?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="cancelSessionDelete">Cancel</button>
+                <button class="btn-confirm" id="confirmSessionDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete All Modal -->
+    <div id="deleteAllModal" class="modal" style = "display: none;">
+        <div class="modal-content">
+            <h3>Delete All Chat History</h3>
+            <p>Are you sure? This will delete ALL your conversations permanently.</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="cancelAllDelete">Cancel</button>
+                <button class="btn-confirm" id="confirmAllDelete">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/chat-history.js"></script>
+</body>
+</html>

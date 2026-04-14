@@ -17,3 +17,14 @@ async def delete_account(
     await db.commit()
     
     return {"message": "Account deleted"}
+
+@router.get("/me")
+async def get_profile(
+    current_user: User = Depends(get_current_user)
+):
+    """Get current user profile"""
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "created_at": current_user.created_at
+    }

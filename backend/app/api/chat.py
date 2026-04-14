@@ -13,8 +13,8 @@ from app.services.chatguide import Chat
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-# Create chatbot instance
-chatbot = Chat()  # Change to your class name
+
+chatbot = Chat()  
 
 class ChatRequest(BaseModel):
     message: str
@@ -113,3 +113,132 @@ async def get_history(
         })
     
     return {"sessions": history}
+@router.get("/export/all")
+async def export_all_chats(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Export all chat sessions as JSON"""
+    result = await db.execute(
+        select(ChatSession)
+        .where(ChatSession.user_id == current_user.id)
+        .order_by(ChatSession.started_at.desc())
+    )
+    sessions = result.scalars().all()
+    
+    export_data = {
+        "user": current_user.username,
+        "exported_at": datetime.utcnow().isoformat(),
+        "sessions": []
+    }
+    
+    for session in sessions:
+        msg_result = await db.execute(
+            select(Message)
+            .where(Message.session_id == session.id)
+            .order_by(Message.timestamp)
+        )
+        messages = msg_result.scalars().all()
+        
+        export_data["sessions"].append({
+            "session_id": session.id,
+            "started_at": session.started_at.isoformat(),
+            "crisis_detected": session.crisis_detected,
+            "messages": [
+                {
+                    "sender": m.sender,
+                    "content": m.content,
+                    "timestamp": m.timestamp.isoformat()
+                }
+                for m in messages
+            ]
+        })
+    
+    return export_data
+
+@router.get("/export/{session_id}")
+async def export_session(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Export a single chat session"""
+    result = await db.execute(
+        select(ChatSession)
+        .where(
+            ChatSession.id == session_id,
+            ChatSession.user_id == current_user.id
+        )
+    )
+    session = result.scalar_one_or_none()
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    msg_result = await db.execute(
+        select(Message)
+        .where(Message.session_id == session.id)
+        .order_by(Message.timestamp)
+    )
+    messages = msg_result.scalars().all()
+    
+    return {
+        "session_id": session.id,
+        "started_at": session.started_at.isoformat(),
+        "crisis_detected": session.crisis_detected,
+        "messages": [
+            {
+                "sender": m.sender,
+                "content": m.content,
+                "timestamp": m.timestamp.isoformat()
+            }
+            for m in messages
+        ]
+    }
+
+# ============================================
+# NEW: DELETE ENDPOINTS
+# ============================================
+
+@router.delete("/session/{session_id}")
+async def delete_session(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a single chat session"""
+    result = await db.execute(
+        select(ChatSession)
+        .where(
+            ChatSession.id == session_id,
+            ChatSession.user_id == current_user.id
+        )
+    )
+    session = result.scalar_one_or_none()
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    await db.delete(session)
+    await db.commit()
+    
+    return {"message": "Session deleted"}
+
+@router.delete("/all")
+async def delete_all_sessions(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete all chat sessions for the current user"""
+    result = await db.execute(
+        select(ChatSession)
+        .where(ChatSession.user_id == current_user.id)
+    )
+    sessions = result.scalars().all()
+    
+    for session in sessions:
+        await db.delete(session)
+    
+    await db.commit()
+    
+    return {"message": f"Deleted {len(sessions)} sessions"}
