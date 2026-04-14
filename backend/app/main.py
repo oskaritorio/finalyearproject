@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from app.api import journal, mood, chat, user
+from app.api import journal, mood, chat, user, wellbeing
 from app.auth import routes as auth_routes
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,6 +34,7 @@ app.include_router(journal.router)
 app.include_router(mood.router)
 app.include_router(chat.router)
 app.include_router(user.router)
+app.include_router(wellbeing.router)
 
 @app.get("/")
 async def root():

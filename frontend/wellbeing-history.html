@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Wellbeing History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #F0E6D6;
+        }
+        .history-category {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .category-excellent { background: #48BB78; color: white; }
+        .category-good { background: #9CAF88; color: white; }
+        .category-moderate { background: #ECC94B; color: #5C4B3A; }
+        .category-concerning { background: #ED8936; color: white; }
+        .category-critical { background: #E53E3E; color: white; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-sage);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journal.html">Journal</a>
+                <a href="chat.html">Chat</a>
+                <a href="mood.html">Mood & Wellbeing</a>
+                <a href="settings.html">Settings</a>
+                <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
+            </div>
+        </div>
+
+        <a href="mood.html" class="back-link">← Back to Mood & Wellbeing</a>
+
+        <div class="card">
+            <h2>📊 Full Wellbeing History</h2>
+            <div id="historyContainer">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/wellbeing-history.js"></script>
+</body>
+</html>

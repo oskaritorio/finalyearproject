@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Wellbeing Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            background: var(--card-warm);
+            box-shadow: var(--shadow-soft);
+        }
+        .score-number {
+            font-size: 48px;
+            font-weight: 700;
+        }
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        .tips-list li {
+            padding: 12px;
+            margin: 8px 0;
+            background: #F0E6D6;
+            border-radius: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📓 MuseChum</h1>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="journal.html">Journal</a>
+                <a href="chat.html">Chat</a>
+                <a href="mood.html">Mood & Wellbeing</a>
+                <a href="settings.html">Settings</a>
+                <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="card">
+            <div class="loading">Loading your results...</div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/wellbeing-results.js"></script>
+</body>
+</html>

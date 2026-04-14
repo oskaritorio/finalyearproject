@@ -3,107 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MuseChum - Mood History</title>
+    <title>MuseChum - Wellbeing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .mood-stats {
-            background: white;
-            border-radius: 20px;
+        .section-card {
+            background: var(--card-warm);
+            border-radius: 24px;
             padding: 24px;
             margin-bottom: 24px;
-            text-align: center;
         }
-        
-        .average-mood {
-            font-size: 48px;
-            margin: 20px 0;
-        }
-        
-        .mood-list {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-        }
-        
-        .mood-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .mood-emoji-large {
-            font-size: 32px;
-        }
-        
         .quick-mood {
             display: flex;
             gap: 20px;
             justify-content: center;
             margin: 20px 0;
         }
-        
         .quick-mood-btn {
-            font-size: 40px;
+            font-size: 48px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 60px;
         }
-        
         .quick-mood-btn:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
+            background: var(--accent-honey);
         }
+        .wellbeing-preview {
+            background: linear-gradient(135deg, #FDF8F0 0%, #FFF5E8 100%);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+        }
+        .btn-wellbeing {
+            background: var(--accent-sage);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        .wellbeing-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--accent-sage);
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #F0E6D6;
+        }
+        .history-category {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .category-excellent { background: #48BB78; color: white; }
+        .category-good { background: #9CAF88; color: white; }
+        .category-moderate { background: #ECC94B; color: #5C4B3A; }
+        .category-concerning { background: #ED8936; color: white; }
+        .category-critical { background: #E53E3E; color: white; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📓 MuseChum</h1>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="journal.html">Journal</a>
                 <a href="chat.html">Chat</a>
-                <a href="mood.html" class="active">Mood</a>
+                <a href="mood.html" class="active">Wellbeing</a>
                 <a href="settings.html">Settings</a>
-                <a href="#" class="logout-link" onclick="logout()">Logout</a>
+                <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
             </div>
         </div>
 
         <!-- Quick Mood Check-in -->
-        <div class="mood-stats">
+        <div class="section-card">
             <h2>😊 How are you feeling right now?</h2>
             <div class="quick-mood">
-                <span class="quick-mood-btn" onclick="quickMood(1)">😢</span>
-                <span class="quick-mood-btn" onclick="quickMood(2)">😐</span>
-                <span class="quick-mood-btn" onclick="quickMood(3)">🙂</span>
-                <span class="quick-mood-btn" onclick="quickMood(4)">😊</span>
-                <span class="quick-mood-btn" onclick="quickMood(5)">🤗</span>
+                <span class="quick-mood-btn" data-mood="1">😢</span>
+                <span class="quick-mood-btn" data-mood="2">😐</span>
+                <span class="quick-mood-btn" data-mood="3">🙂</span>
+                <span class="quick-mood-btn" data-mood="4">😊</span>
+                <span class="quick-mood-btn" data-mood="5">🤗</span>
+            </div>
+            <div id="quickMoodMessage" style="text-align: center; margin-top: 12px; color: var(--text-light);"></div>
+        </div>
+
+        <!-- Deep Wellbeing Assessment -->
+        <div class="section-card">
+            <div class="wellbeing-preview">
+                <h3>🌿 Take a Deeper Look</h3>
+                <p>Complete a 9-question wellbeing assessment to get personalised insights and tips.</p>
+                
+                <div id="latestWellbeing" style="display: none;">
+                    <div class="wellbeing-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="lastScore">--</div>
+                            <div class="stat-label">Last Score</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="lastCategory">--</div>
+                            <div class="stat-label">Category</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="lastDate">--</div>
+                            <div class="stat-label">Date</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="takeAssessmentBtn" class="btn-wellbeing">Take Wellbeing Assessment →</button>
             </div>
         </div>
 
-        <!-- Mood Statistics -->
-        <div class="mood-stats">
-            <h2>📊 Your Mood Overview</h2>
-            <div class="average-mood" id="averageMood">--</div>
-            <div id="moodCount">0 entries</div>
-        </div>
-
-        <!-- Mood History -->
-        <div class="mood-list">
-            <h2>📅 Recent Moods</h2>
-            <div id="moodHistoryContainer">
+        <!-- Recent Wellbeing History -->
+        <div class="section-card">
+            <h3>📊 Recent Wellbeing Checks</h3>
+            <div id="historyContainer" class="history-list">
                 <div class="loading">Loading...</div>
+            </div>
+            <div class="view-all" style="text-align: center; margin-top: 16px;">
+                <a href="wellbeing-history.html">View Full History →</a>
             </div>
         </div>
     </div>
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/mood.js"></script>
-    
     <script>
-        initMood();
+        
+        function getAuth() {
+            const auth = localStorage.getItem('auth');
+            return auth ? { 'Authorization': 'Basic ' + auth } : {};
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        // Check login
+        if (!localStorage.getItem('user')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Quick mood logging
+        document.querySelectorAll('.quick-mood-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const mood = parseInt(btn.getAttribute('data-mood'));
+                const messageDiv = document.getElementById('quickMoodMessage');
+                
+                try {
+                    const response = await fetch(API_URL + '/mood/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...getAuth()
+                        },
+                        body: JSON.stringify({ mood_score: mood })
+                    });
+                    
+                    if (response.ok && messageDiv) {
+                        messageDiv.innerHTML = '✅ Mood logged!';
+                        messageDiv.style.color = '#9CAF88';
+                        setTimeout(() => { messageDiv.innerHTML = ''; }, 2000);
+                    } else if (response.status === 400 && messageDiv) {
+                        messageDiv.innerHTML = '📅 Already logged today';
+                        messageDiv.style.color = '#E8A598';
+                        setTimeout(() => { messageDiv.innerHTML = ''; }, 2000);
+                    }
+                } catch (error) {
+                    if (messageDiv) {
+                        messageDiv.innerHTML = '❌ Cannot connect';
+                        setTimeout(() => { messageDiv.innerHTML = ''; }, 2000);
+                    }
+                }
+            });
+        });
+        
+        // Load latest wellbeing
+        async function loadLatestWellbeing() {
+            try {
+                const response = await fetch(API_URL + '/wellbeing/latest', {
+                    headers: getAuth()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.has_assessment) {
+                        const latestDiv = document.getElementById('latestWellbeing');
+                        if (latestDiv) latestDiv.style.display = 'block';
+                        const scoreEl = document.getElementById('lastScore');
+                        const categoryEl = document.getElementById('lastCategory');
+                        const dateEl = document.getElementById('lastDate');
+                        if (scoreEl) scoreEl.textContent = data.total_score;
+                        if (categoryEl) categoryEl.textContent = data.category;
+                        if (dateEl) dateEl.textContent = new Date(data.date).toLocaleDateString();
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Load history
+        async function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            if (!container) return;
+            
+            try {
+                const response = await fetch(API_URL + '/wellbeing/history', {
+                    headers: getAuth()
+                });
+                
+                if (response.ok) {
+                    const history = await response.json();
+                    if (history.length === 0) {
+                        container.innerHTML = '<div class="empty-state">No assessments yet</div>';
+                        return;
+                    }
+                    
+                    const categoryClass = {
+                        'Excellent': 'category-excellent',
+                        'Good': 'category-good',
+                        'Moderate': 'category-moderate',
+                        'Concerning': 'category-concerning',
+                        'Critical': 'category-critical'
+                    };
+                    
+                    let html = '';
+                    for (let i = 0; i < Math.min(history.length, 3); i++) {
+                        const item = history[i];
+                        html += `
+                            <div class="history-item">
+                                <div>
+                                    <strong>${new Date(item.date).toLocaleDateString()}</strong>
+                                    <br>
+                                    <small>Score: ${item.total_score}/5</small>
+                                </div>
+                                <span class="history-category ${categoryClass[item.category] || 'category-moderate'}">${item.category}</span>
+                            </div>
+                        `;
+                    }
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="empty-state">Failed to load</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="empty-state">Cannot connect</div>';
+            }
+        }
+        
+        // Take assessment button
+        const takeBtn = document.getElementById('takeAssessmentBtn');
+        if (takeBtn) {
+            takeBtn.addEventListener('click', () => {
+                window.location.href = 'wellbeing.html';
+            });
+        }
+        
+        loadLatestWellbeing();
+        loadHistory();
     </script>
 </body>
 </html>
