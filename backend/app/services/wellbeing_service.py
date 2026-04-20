@@ -1,6 +1,5 @@
 """
 Wellbeing Service - Handles CSV loading and saving for wellbeing assessments
-Demonstrates file I/O, CSV parsing, and data persistence
 """
 import csv
 import os
@@ -9,12 +8,10 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
-# File paths
 DATA_DIR = Path("/app/data")
 TIPS_FILE = DATA_DIR / "wellbeing_tips.csv"
 RESULTS_FILE = DATA_DIR / "wellbeing_results.csv"
 
-# Ensure data directory exists
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -23,18 +20,18 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 # ============================================
 
 SWEMWBS_QUESTIONS = [
-    {"id": "q1_optimistic", "text": "I've been feeling optimistic about the future", "focus": "optimistic"},
-    {"id": "q2_useful", "text": "I've been feeling useful", "focus": "useful"},
-    {"id": "q3_relaxed", "text": "I've been feeling relaxed", "focus": "relaxed"},
-    {"id": "q4_dealing", "text": "I've been dealing with problems well", "focus": "dealing"},
-    {"id": "q5_thinking", "text": "I've been thinking clearly", "focus": "thinking"},
-    {"id": "q6_close", "text": "I've been feeling close to other people", "focus": "close"},
-    {"id": "q7_decisions", "text": "I've been able to make up my own mind about things", "focus": "decisions"},
+    {"id": "q1_optimistic", "text": "I've been feeling optimistic about the future", "focus": "optimistic", "negative": False},
+    {"id": "q2_useful", "text": "I've been feeling useful", "focus": "useful", "negative": False},
+    {"id": "q3_relaxed", "text": "I've been feeling relaxed", "focus": "relaxed", "negative": False},
+    {"id": "q4_dealing", "text": "I've been dealing with problems well", "focus": "dealing", "negative": False},
+    {"id": "q5_thinking", "text": "I've been thinking clearly", "focus": "thinking", "negative": False},
+    {"id": "q6_close", "text": "I've been feeling close to other people", "focus": "close", "negative": False},
+    {"id": "q7_decisions", "text": "I've been able to make up my own mind about things", "focus": "decisions", "negative": False},
 ]
 
 PHQ2_QUESTIONS = [
-    {"id": "q8_interest", "text": "Little interest or pleasure in doing things", "focus": "interest"},
-    {"id": "q9_depressed", "text": "Feeling down, depressed, or hopeless", "focus": "depressed"},
+    {"id": "q8_interest", "text": "Little interest or pleasure in doing things", "focus": "interest", "negative": True},
+    {"id": "q9_depressed", "text": "Feeling down, depressed, or hopeless", "focus": "depressed", "negative": True},
 ]
 
 ALL_QUESTIONS = SWEMWBS_QUESTIONS + PHQ2_QUESTIONS
@@ -54,21 +51,39 @@ def calculate_category(score: float) -> Tuple[str, str]:
         return "Critical", "🔴"
 
 
-# ============================================
-# WELLBEING SERVICE CLASS
-# ============================================
+def flip_negative_score(score: int) -> int:
+    """Flip score for negative questions: 1→5, 2→4, 3→3, 4→2, 5→1"""
+    return 6 - score
+
+
+def process_responses(responses: Dict) -> Dict:
+    """Process responses: flip negative questions"""
+    processed = {}
+    
+    for q in ALL_QUESTIONS:
+        q_id = q["id"]
+        original_score = responses.get(q_id, 3)
+        
+        if q["negative"]:
+            # Flip negative questions
+            processed[q_id] = flip_negative_score(original_score)
+            print(f"Flipped {q_id}: {original_score} → {processed[q_id]}")
+        else:
+            processed[q_id] = original_score
+    
+    return processed
+
 
 class WellbeingService:
-    """Service for managing wellbeing assessments with CSV storage"""
     
     @staticmethod
     def load_tips() -> List[Dict]:
-        """Load tips from CSV file - demonstrates file reading and CSV parsing"""
+        """Load tips from CSV file"""
         tips = []
         
         if not TIPS_FILE.exists():
             print(f"Warning: Tips file not found at {TIPS_FILE}")
-            return WellbeingService._get_default_tips()
+            return []
         
         try:
             with open(TIPS_FILE, 'r', encoding='utf-8') as file:
@@ -84,32 +99,27 @@ class WellbeingService:
             print(f"Loaded {len(tips)} tips from CSV")
         except Exception as e:
             print(f"Error loading tips: {e}")
-            return WellbeingService._get_default_tips()
         
         return tips
     
     @staticmethod
-    def _get_default_tips() -> List[Dict]:
-        """Fallback tips if CSV file not found"""
-        return [
-            {'category': 'general', 'question_focus': 'general', 'score_min': 0, 'score_max': 5, 'tip': 'Take care of yourself today.'},
-            {'category': 'optimistic', 'question_focus': 'optimistic', 'score_min': 1, 'score_max': 2, 'tip': 'Try writing down one good thing that happened today.'},
-        ]
-    
-    @staticmethod
-    def get_tips_for_assessment(scores: Dict, total_score: float, category: str) -> List[str]:
-        """Get personalised tips based on scores - demonstrates data processing"""
+    def get_tips_for_assessment(responses: Dict, total_score: float, category: str) -> List[str]:
+        """Get personalised tips based on scores"""
         tips = WellbeingService.load_tips()
         selected_tips = []
         
+        # Process responses to get flipped scores for low score detection
+        processed = process_responses(responses)
+        
         # Add general category tips
+        category_lower = category.lower()
         for tip in tips:
-            if tip['category'] == 'general' and tip['question_focus'] == category.lower():
+            if tip['category'] == 'general' and tip['question_focus'] == category_lower:
                 if tip['score_min'] <= total_score <= tip['score_max']:
                     selected_tips.append(tip['tip'])
                     break
         
-        # Add question-specific tips for low scores (1-2)
+        # Add question-specific tips for low scores (1-2) on flipped scores
         question_mapping = {
             'q1_optimistic': 'optimistic',
             'q2_useful': 'useful', 
@@ -123,45 +133,43 @@ class WellbeingService:
         }
         
         for q_key, focus in question_mapping.items():
-            score = scores.get(q_key, 3)
-            if score <= 2:  # Low score, needs tip
+            # Use the flipped score from processed dict
+            score = processed.get(q_key, 3)
+            if score <= 2:  # Low score after flipping
                 for tip in tips:
-                    if tip['question_focus'] == focus and tip['score_min'] <= score <= tip['score_max']:
-                        selected_tips.append(tip['tip'])
-                        break
+                    if tip['category'] == 'specific' and tip['question_focus'] == focus:
+                        if tip['score_min'] <= score <= tip['score_max']:
+                            selected_tips.append(tip['tip'])
+                            break
         
-        # Add PHQ-2 specific alert if needed
-        phq2_avg = (scores.get('q8_interest', 3) + scores.get('q9_depressed', 3)) / 2
-        if phq2_avg > 3.5:
-            selected_tips.append("💙 You've been experiencing low mood. Please consider reaching out to a mental health professional.")
-        
-        # Return unique tips (no duplicates)
-        return list(dict.fromkeys(selected_tips))[:5]  # Max 5 tips
+        # Remove duplicates and limit to 5 tips
+        return list(dict.fromkeys(selected_tips))[:5]
     
     @staticmethod
     def save_assessment(user_id: str, responses: Dict, total_score: float, category: str, tips: List[str]) -> bool:
-        """Save assessment results to CSV - demonstrates file writing and data persistence"""
+        """Save assessment results to CSV"""
         
-        # Prepare row data
+        # Process responses to flip negative questions for storage
+        processed = process_responses(responses)
+        
         row = {
             'id': str(uuid.uuid4()),
             'user_id': user_id,
             'date': datetime.utcnow().isoformat(),
             'total_score': round(total_score, 2),
             'category': category,
-            'q1_optimistic': responses.get('q1_optimistic', 3),
-            'q2_useful': responses.get('q2_useful', 3),
-            'q3_relaxed': responses.get('q3_relaxed', 3),
-            'q4_dealing': responses.get('q4_dealing', 3),
-            'q5_thinking': responses.get('q5_thinking', 3),
-            'q6_close': responses.get('q6_close', 3),
-            'q7_decisions': responses.get('q7_decisions', 3),
-            'q8_interest': responses.get('q8_interest', 3),
-            'q9_depressed': responses.get('q9_depressed', 3),
-            'tips': '|'.join(tips[:3])  # Store first 3 tips
+            'q1_optimistic': processed.get('q1_optimistic', 3),
+            'q2_useful': processed.get('q2_useful', 3),
+            'q3_relaxed': processed.get('q3_relaxed', 3),
+            'q4_dealing': processed.get('q4_dealing', 3),
+            'q5_thinking': processed.get('q5_thinking', 3),
+            'q6_close': processed.get('q6_close', 3),
+            'q7_decisions': processed.get('q7_decisions', 3),
+            'q8_interest': processed.get('q8_interest', 3),
+            'q9_depressed': processed.get('q9_depressed', 3),
+            'tips': '|'.join(tips[:3])
         }
         
-        # Check if file exists to write headers
         file_exists = RESULTS_FILE.exists()
         
         try:
@@ -178,7 +186,7 @@ class WellbeingService:
     
     @staticmethod
     def get_user_history(user_id: str) -> List[Dict]:
-        """Get all assessments for a user - demonstrates CSV reading and filtering"""
+        """Get all assessments for a user"""
         history = []
         
         if not RESULTS_FILE.exists():
@@ -189,12 +197,10 @@ class WellbeingService:
                 reader = csv.DictReader(file)
                 for row in reader:
                     if row.get('user_id') == user_id:
-                        # Convert tips back to list
                         tips_str = row.get('tips', '')
                         row['tips_list'] = tips_str.split('|') if tips_str else []
                         history.append(row)
             
-            # Sort by date descending (most recent first)
             history.sort(key=lambda x: x.get('date', ''), reverse=True)
         except Exception as e:
             print(f"Error reading history: {e}")

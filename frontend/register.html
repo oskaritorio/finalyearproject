@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseChum - Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-warm: #FFF8F0;
+            --card-warm: #FFFFFF;
+            --accent-sage: #9CAF88;
+            --accent-terracotta: #E8A598;
+            --text-soft: #5C4B3A;
+            --text-light: #8B7A6B;
+            --shadow-soft: 0 8px 30px rgba(0,0,0,0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF4E3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: var(--card-warm);
+            border-radius: 32px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--accent-sage) 0%, var(--accent-terracotta) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            margin: 10px 0;
+            border: 2px solid #F0E6D6;
+            border-radius: 60px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-sage);
+            box-shadow: 0 0 0 4px rgba(156, 175, 136, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--accent-sage) 0%, #8BAF78 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(156, 175, 136, 0.4);
+        }
+
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .success-message {
+            color: var(--accent-sage);
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .login-link {
+            margin-top: 24px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: var(--accent-sage);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>📓 MuseChum</h1>
+        <div class="subtitle">Create your account</div>
+        
+        <div id="errorMessage" class="error-message hidden"></div>
+        <div id="successMessage" class="success-message hidden"></div>
+        
+        <input type="text" id="username" placeholder="Username" autocomplete="off">
+        <input type="password" id="password" placeholder="Password">
+        <input type="password" id="confirmPassword" placeholder="Confirm Password">
+        
+        <button id="registerBtn">Create Account</button>
+        
+        <div class="login-link">
+            Already have an account? <a href="index.html">Login</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirmPassword');
+        const registerBtn = document.getElementById('registerBtn');
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+        
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            successDiv.classList.add('hidden');
+        }
+        
+        function showSuccess(message) {
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+        }
+        
+        function hideMessages() {
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+        }
+        
+        async function handleRegister() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+            
+            hideMessages();
+            
+            if (!username || !password) {
+                showError('Please enter username and password');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 4) {
+                showError('Password must be at least 4 characters');
+                return;
+            }
+            
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Creating account...';
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showSuccess(`Account created successfully! Redirecting to login...`);
+                    
+                    usernameInput.value = '';
+                    passwordInput.value = '';
+                    confirmInput.value = '';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else if (response.status === 400) {
+                    const error = await response.text();
+                    if (error.includes('already exists')) {
+                        showError('Username already exists. Please choose another.');
+                    } else {
+                        showError('Registration failed. Please try again.');
+                    }
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Create Account';
+                } else {
+                    showError('Registration failed. Please try again.');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Create Account';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError('Cannot connect to server. Is the backend running?');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Create Account';
+            }
+        }
+        
+        // Press Enter to register
+        confirmInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleRegister();
+        });
+        
+        registerBtn.addEventListener('click', handleRegister);
+        
+        // If already logged in, go to dashboard
+        if (localStorage.getItem('user')) {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

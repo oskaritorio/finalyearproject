@@ -12,105 +12,70 @@ from app.models.user import User
 
 router = APIRouter(prefix="/journal", tags=["journal"])
 
-# Simple request/response models (no separate schemas file needed!)
 class JournalCreate(BaseModel):
-    content: str  # Already encrypted by frontend
-    mood: int     # 1-5 scale
+    content: str
+    mood: int
 
 class JournalResponse(BaseModel):
     id: str
     content: str
-    mood: int
+    mood_score: int  # Make sure this field exists
     created_at: datetime
 
 @router.post("/")
 async def create_journal(
     journal: JournalCreate,
-    current_user: User = Depends(get_current_user),  # Gets logged-in user
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    try:
-        entry = JournalEntry(
-            id=str(uuid.uuid4()),
-            user_id=current_user.id,  # Use REAL user ID from auth
-            encrypted_content=journal.content,
-            mood_score=journal.mood,
-            created_at=datetime.utcnow()
-        )
-        
-        db.add(entry)
-        await db.commit()
-        
-        return {
-            "id": entry.id,
-            "content": entry.encrypted_content,
-            "mood": entry.mood_score,
-            "created_at": entry.created_at,
-            "message": "Journal entry saved!"
-        }
-    except Exception as e:
-        await db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+    """Create a journal entry"""
+    
+    entry = JournalEntry(
+        id=str(uuid.uuid4()),
+        user_id=current_user.id,
+        encrypted_content=journal.content,
+        mood_score=journal.mood,
+        created_at=datetime.utcnow()
+    )
+    
+    db.add(entry)
+    await db.commit()
+    await db.refresh(entry)
+    
+    # Return the entry with mood_score
+    return {
+        "id": entry.id,
+        "content": entry.encrypted_content,
+        "mood_score": entry.mood_score,  # CRITICAL: Include this
+        "created_at": entry.created_at
+    }
 
 @router.get("/")
-async def get_my_journals(
+async def get_journals(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get all journals for the logged-in user"""
-    try:
-        result = await db.execute(
-            select(JournalEntry)
-            .where(JournalEntry.user_id == current_user.id)
-            .order_by(JournalEntry.created_at.desc())
-        )
-        entries = result.scalars().all()
-        
-        return {
-            "user": current_user.username,
-            "count": len(entries),
-            "entries": [
-                {
-                    "id": e.id,
-                    "content": e.encrypted_content,
-                    "mood": e.mood_score,
-                    "created_at": e.created_at
-                }
-                for e in entries
-            ]
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/{entry_id}")
-async def get_one_journal(
-    entry_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Get a specific journal entry"""
-    try:
-        result = await db.execute(
-            select(JournalEntry).where(
-                JournalEntry.id == entry_id,
-                JournalEntry.user_id == current_user.id  # Ensure ownership
-            )
-        )
-        entry = result.scalar_one_or_none()
-        
-        if not entry:
-            raise HTTPException(status_code=404, detail="Entry not found")
-        
-        return {
-            "id": entry.id,
-            "content": entry.encrypted_content,
-            "mood": entry.mood_score,
-            "created_at": entry.created_at
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """Get all journal entries for current user"""
+    
+    result = await db.execute(
+        select(JournalEntry)
+        .where(JournalEntry.user_id == current_user.id)
+        .order_by(JournalEntry.created_at.desc())
+    )
+    entries = result.scalars().all()
+    
+    # Return entries with mood_score included
+    return {
+        "entries": [
+            {
+                "id": e.id,
+                "content": e.encrypted_content,
+                "mood_score": e.mood_score,  # CRITICAL: Include this
+                "created_at": e.created_at
+            }
+            for e in entries
+        ]
+    }
 
 @router.delete("/{entry_id}")
 async def delete_journal(
@@ -119,24 +84,19 @@ async def delete_journal(
     db: AsyncSession = Depends(get_db)
 ):
     """Delete a journal entry"""
-    try:
-        result = await db.execute(
-            select(JournalEntry).where(
-                JournalEntry.id == entry_id,
-                JournalEntry.user_id == current_user.id
-            )
+    
+    result = await db.execute(
+        select(JournalEntry).where(
+            JournalEntry.id == entry_id,
+            JournalEntry.user_id == current_user.id
         )
-        entry = result.scalar_one_or_none()
-        
-        if not entry:
-            raise HTTPException(status_code=404, detail="Entry not found")
-        
-        await db.delete(entry)
-        await db.commit()
-        
-        return {"message": "Entry deleted successfully"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        await db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+    )
+    entry = result.scalar_one_or_none()
+    
+    if not entry:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    
+    await db.delete(entry)
+    await db.commit()
+    
+    return {"message": "Deleted"}

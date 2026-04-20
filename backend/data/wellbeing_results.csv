@@ -1,2 +1,9 @@
 id,user_id,date,total_score,category,q1_optimistic,q2_useful,q3_relaxed,q4_dealing,q5_thinking,q6_close,q7_decisions,q8_interest,q9_depressed,tips
 5d4fa55b-4b15-4075-b71a-68c36ffb33fc,68cfd8df-08cc-4543-9f77-0f6956577eb3,2026-04-14T13:56:44.047711,3.33,Moderate,2,4,4,4,4,4,4,2,2,Try writing down one good thing that happened today.
+bd68aed3-bebc-4f80-bcfb-f61aead7bf33,b6c3caf7-0aec-4707-85d7-3740f111bac2,2026-04-20T10:25:33.189786,2.67,Moderate,3,4,2,4,2,5,2,1,1,
+76db0e5a-b335-4a89-9b3b-8ba4f9f74552,b6c3caf7-0aec-4707-85d7-3740f111bac2,2026-04-20T10:27:24.436687,1.0,Critical,1,1,1,1,1,1,1,1,1,Try writing down one good thing that happened today.
+f5440c63-25dd-4cc3-a577-6e7e189d56c7,6b52f1aa-b1b2-4ea7-9c7b-827a790bd877,2026-04-20T11:02:45.398738,3.33,Moderate,3,4,2,4,2,3,4,4,4,You're managing. Focus on small|Try this: breathe in for 4 seconds|Take a 5-minute walk to clear your mind. Fresh air helps.
+c80df0f4-6f18-4d12-82d8-c3356b69dc5f,6b52f1aa-b1b2-4ea7-9c7b-827a790bd877,2026-04-20T11:05:11.125489,5.0,Excellent,5,5,5,5,5,5,5,5,5,You're thriving! Keep up your great habits - they're working well.|💙 You've been experiencing low mood. Please consider reaching out to a mental health professional.
+04cb72ef-9cc2-41bc-a0a0-587b29a7fec2,6b52f1aa-b1b2-4ea7-9c7b-827a790bd877,2026-04-20T11:05:29.480897,5.0,Excellent,5,5,5,5,5,5,5,5,5,You're thriving! Keep up your great habits - they're working well.|💙 You've been experiencing low mood. Please consider reaching out to a mental health professional.
+f945ba0f-c8b4-4e21-8b2d-46e79eb8705c,6b52f1aa-b1b2-4ea7-9c7b-827a790bd877,2026-04-20T11:09:53.166864,4.11,Good,5,5,5,5,5,5,5,1,1,You're doing well. Try adding one new positive activity to your routine.
+e58e6b25-fcd6-46b3-9b3b-f32a54e3bb25,6b52f1aa-b1b2-4ea7-9c7b-827a790bd877,2026-04-20T11:10:24.859665,1.89,Concerning,1,1,1,1,1,1,1,5,5,Your wellbeing matters. Consider talking to someone you trust.

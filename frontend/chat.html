@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Only chat-specific styles */
         .chat-container {
             background: var(--card-warm);
             border-radius: 32px;
@@ -16,6 +15,15 @@
             display: flex;
             flex-direction: column;
             box-shadow: var(--shadow-soft);
+        }
+        .warning-banner {
+            background: #e53e3e;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 15px;
         }
         .chat-messages {
             flex: 1;
@@ -32,7 +40,7 @@
             justify-content: flex-end;
         }
         .message.user .message-content {
-            background: linear-gradient(135deg, var(--accent-sage) 0%, #8BAF78 100%);
+            background: linear-gradient(135deg, #9CAF88 0%, #8BAF78 100%);
             color: white;
             padding: 12px 20px;
             border-radius: 28px;
@@ -40,8 +48,8 @@
             max-width: 75%;
         }
         .message.bot .message-content {
-            background: var(--accent-honey);
-            color: var(--text-soft);
+            background: #F2D5A0;
+            color: #5C4B3A;
             padding: 12px 20px;
             border-radius: 28px;
             border-bottom-left-radius: 8px;
@@ -61,22 +69,32 @@
         }
         .input-area input:focus {
             outline: none;
-            border-color: var(--accent-sage);
-            box-shadow: 0 0 0 4px rgba(156, 175, 136, 0.1);
+            border-color: #9CAF88;
+        }
+        .input-area button {
+            background: #9CAF88;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 60px;
+            cursor: pointer;
         }
         .crisis-alert {
-            background: linear-gradient(135deg, #FDE2E2 0%, #FCE8E8 100%);
-            border: 2px solid var(--accent-terracotta);
-            border-radius: 24px;
-            padding: 16px;
-            margin-top: 16px;
-            color: #C2786B;
+            background: #fee2e2;
+            border: 2px solid #e53e3e;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            color: #e53e3e;
             font-size: 13px;
             text-align: center;
-            animation: pulse 2s infinite;
         }
         .hidden {
             display: none;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -87,10 +105,10 @@
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="journal.html">Journal</a>
-                <a href="chat.html" style="font-weight: bold; color: #4A90D9;">Chat</a>
-                <a href="mood.html">Mood</a>
+                <a href="chat.html" class="active">Chat</a>
+                <a href="mood.html">Mood & Wellbeing</a>
                 <a href="settings.html">Settings</a>
-                <a href="#" onclick="logout()" style="color: #e53e3e;">Logout</a>
+                <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
             </div>
         </div>
 
@@ -100,7 +118,7 @@
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
-                    <div class="message-content">Hello! I'm here to listen. How are you feeling today?</div>
+                    <div class="message-content">Hello! I'm here to listen. What's on your mind today?</div>
                 </div>
             </div>
             <div class="input-area">
@@ -109,19 +127,21 @@
             </div>
             <div id="crisisAlert" class="crisis-alert hidden">
                 🆘 If you're in crisis, please reach out:<br>
-                📞 Samaritans: 116 123 (free, 24/7)<br>
-                📞 NHS 111: 111<br>
-                📞 SHOUT: Text 85258
+                Samaritans: 116 123 (free, 24/7)<br>
+                NHS 111: 111<br>
+                SHOUT: Text 85258
             </div>
         </div>
     </div>
 
     <script>
         const API_URL = 'http://localhost:8000';
+        let conversationHistory = [];
+        let detectedName = null;
         
         function getAuth() {
             const auth = localStorage.getItem('auth');
-            return auth ? { 'Authorization': `Basic ${auth}` } : {};
+            return auth ? { 'Authorization': 'Basic ' + auth } : {};
         }
         
         function escapeHtml(text) {
@@ -137,14 +157,23 @@
             msgDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
+            
+            conversationHistory.push({ sender: sender, text: text });
+            if (conversationHistory.length > 20) conversationHistory.shift();
         }
         
-        function showCrisisAlert() {
-            document.getElementById('crisisAlert').classList.remove('hidden');
-        }
-        
-        function hideCrisisAlert() {
-            document.getElementById('crisisAlert').classList.add('hidden');
+        function extractName(message) {
+            const patterns = [
+                /my name is (\w+)/i,
+                /i'm (\w+)/i,
+                /i am (\w+)/i,
+                /call me (\w+)/i
+            ];
+            for (const pattern of patterns) {
+                const match = message.match(pattern);
+                if (match) return match[1].charAt(0).toUpperCase() + match[1].slice(1);
+            }
+            return null;
         }
         
         async function sendMessage() {
@@ -155,6 +184,12 @@
             
             addMessage(message, 'user');
             input.value = '';
+            
+            const name = extractName(message);
+            if (name) {
+                detectedName = name;
+                console.log('Name detected:', detectedName);
+            }
             
             try {
                 const response = await fetch(`${API_URL}/chat/`, {
@@ -168,17 +203,24 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    addMessage(data.reply, 'bot');
+                    let reply = data.reply;
                     
-                    // Check for crisis detection
-                    if (data.category === 'CRISIS' || data.crisis_help) {
-                        showCrisisAlert();
+                    if (detectedName && reply.includes('Hello')) {
+                        reply = `Nice to meet you ${detectedName}! ${reply.replace('Hello', '')}`;
+                    } else if (detectedName && Math.random() > 0.8) {
+                        reply = `${detectedName}, ${reply.toLowerCase()}`;
+                    }
+                    
+                    addMessage(reply, 'bot');
+                    
+                    if (data.category === 'CRISIS') {
+                        document.getElementById('crisisAlert').classList.remove('hidden');
                     } else {
-                        hideCrisisAlert();
+                        document.getElementById('crisisAlert').classList.add('hidden');
                     }
                 } else if (response.status === 401) {
                     addMessage('Session expired. Please login again.', 'bot');
-                    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                    setTimeout(() => window.location.href = 'index.html', 2000);
                 } else {
                     addMessage('Sorry, I had trouble responding. Please try again.', 'bot');
                 }
@@ -193,12 +235,15 @@
             window.location.href = 'index.html';
         }
         
-        // Check login
         if (!localStorage.getItem('user')) {
             window.location.href = 'index.html';
         }
         
-        // Setup event listeners
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.username) {
+            detectedName = user.username;
+        }
+        
         document.getElementById('sendBtn').addEventListener('click', sendMessage);
         document.getElementById('messageInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') sendMessage();

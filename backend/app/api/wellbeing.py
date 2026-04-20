@@ -7,11 +7,11 @@ from app.auth.auth import get_current_user
 from app.models.user import User
 from app.services.wellbeing_service import (
     WellbeingService, ALL_QUESTIONS, SWEMWBS_QUESTIONS, PHQ2_QUESTIONS,
-    calculate_category
+    calculate_category, process_responses
 )
 
 # ============================================
-# ✅ THIS CREATES THE ROUTER
+# ✅ THIS CREATES THE ROUTER - REQUIRED!
 # ============================================
 router = APIRouter(prefix="/wellbeing", tags=["wellbeing"])
 
@@ -61,9 +61,12 @@ async def submit_assessment(
         if not 1 <= responses[q_id] <= 5:
             raise HTTPException(status_code=400, detail=f"Invalid score for {q_id}")
     
-    # Calculate scores
-    swemwbs_scores = [responses[q["id"]] for q in SWEMWBS_QUESTIONS]
-    phq2_scores = [responses[q["id"]] for q in PHQ2_QUESTIONS]
+    # Process responses (flip negative questions)
+    processed_responses = process_responses(responses)
+    
+    # Calculate scores using PROCESSED (flipped) responses
+    swemwbs_scores = [processed_responses[q["id"]] for q in SWEMWBS_QUESTIONS]
+    phq2_scores = [processed_responses[q["id"]] for q in PHQ2_QUESTIONS]
     
     all_scores = swemwbs_scores + phq2_scores
     total_score = sum(all_scores) / len(all_scores)

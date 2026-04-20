@@ -145,14 +145,12 @@ function downloadFile(data, format, filename) {
     URL.revokeObjectURL(url);
 }
 
-// Confirm delete session
-function confirmDeleteSession(sessionId) {
+window.confirmDeleteSession = function(sessionId) {
     currentSessionToDelete = sessionId;
     document.getElementById('deleteSessionModal').classList.add('active');
-}
+};
 
-// Delete single session
-async function deleteSession() {
+window.deleteSession = async function() {
     if (!currentSessionToDelete) return;
     
     try {
@@ -171,10 +169,9 @@ async function deleteSession() {
         alert('Cannot connect to server');
     }
     currentSessionToDelete = null;
-}
+};
 
-// Delete all sessions
-async function deleteAllSessions() {
+window.deleteAllSessions = async function() {
     try {
         const response = await fetch(`${API_URL}/chat/all`, {
             method: 'DELETE',
@@ -190,8 +187,7 @@ async function deleteAllSessions() {
     } catch (error) {
         alert('Cannot connect to server');
     }
-}
-
+};
 // Modal handlers
 document.getElementById('exportAllBtn')?.addEventListener('click', exportAll);
 document.getElementById('deleteAllBtn')?.addEventListener('click', () => {

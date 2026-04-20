@@ -1,19 +1,3 @@
-
-function getAuth() {
-    const auth = localStorage.getItem('auth');
-    return auth ? { 'Authorization': 'Basic ' + auth } : {};
-}
-
-function isLoggedIn() {
-    return localStorage.getItem('user') !== null;
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 function displayResults() {
     const resultStr = localStorage.getItem('lastWellbeingResult');
     const container = document.getElementById('resultsContainer');
@@ -42,6 +26,9 @@ function displayResults() {
     
     const color = categoryColors[result.category] || '#9CAF88';
     
+    // Make sure tips array exists
+    const tips = result.tips || [];
+    
     container.innerHTML = `
         <div style="text-align: center;">
             <h2>🌿 Your Wellbeing Results</h2>
@@ -54,9 +41,12 @@ function displayResults() {
         </div>
         
         <h3>💡 Personalised Tips</h3>
-        <ul class="tips-list">
-            ${result.tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('')}
-        </ul>
+        ${tips.length > 0 ? 
+            `<ul class="tips-list">
+                ${tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('')}
+            </ul>` : 
+            `<p>Keep taking the assessment to receive personalised wellbeing tips.</p>`
+        }
         
         <div class="action-buttons">
             <button onclick="location.href='wellbeing-history.html'">View History</button>
@@ -65,10 +55,3 @@ function displayResults() {
         </div>
     `;
 }
-
-// Check login
-if (!localStorage.getItem('user')) {
-    window.location.href = 'index.html';
-}
-
-displayResults();
