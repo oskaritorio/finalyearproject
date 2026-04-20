@@ -96,6 +96,7 @@ function renderQuestions() {
 }
 
 // Render a single question card
+// Render a single question card with proper label positions
 function renderQuestionCard(q) {
     return `
         <div class="question-card" data-question-id="${q.id}">
@@ -107,9 +108,9 @@ function renderQuestionCard(q) {
                 <div class="scale-option" data-value="4">4</div>
                 <div class="scale-option" data-value="5">5</div>
             </div>
-            <div class="scale-label">
-                <span>None of the time</span>
-                <span style="float: right;">All of the time</span>
+            <div class="scale-labels">
+                <span class="scale-label-left">None of the time</span>
+                <span class="scale-label-right">All of the time</span>
             </div>
         </div>
     `;

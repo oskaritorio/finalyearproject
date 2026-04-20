@@ -22,24 +22,45 @@
         .score-number {
             font-size: 48px;
             font-weight: 700;
+            color: var(--text-soft);
         }
         .tips-list {
             list-style: none;
             padding: 0;
+            margin-top: 20px;
         }
         .tips-list li {
-            padding: 12px;
+            padding: 14px 18px;
             margin: 8px 0;
             background: #F0E6D6;
             border-radius: 16px;
+            color: var(--text-soft);
+            line-height: 1.4;
         }
         .action-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 24px;
+            margin-top: 30px;
+            flex-wrap: wrap;
         }
         .action-buttons button {
             flex: 1;
+            min-width: 120px;
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-sage);
+            text-decoration: none;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -51,11 +72,13 @@
                 <a href="dashboard.html">Dashboard</a>
                 <a href="journal.html">Journal</a>
                 <a href="chat.html">Chat</a>
-                <a href="mood.html">Wellbeing</a>
+                <a href="mood.html">Mood & Wellbeing</a>
                 <a href="settings.html">Settings</a>
                 <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
             </div>
         </div>
+
+        <a href="mood.html" class="back-link">← Back to Mood & Wellbeing</a>
 
         <div id="resultsContainer" class="card">
             <div class="loading">Loading your results...</div>

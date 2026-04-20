@@ -12,17 +12,20 @@
             border-radius: 24px;
             padding: 24px;
             margin-bottom: 20px;
+            box-shadow: var(--shadow-soft);
         }
         .question-text {
             font-size: 18px;
             font-weight: 500;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             color: var(--text-soft);
+            line-height: 1.4;
         }
         .scale {
             display: flex;
             justify-content: space-between;
             gap: 12px;
+            margin: 16px 0;
         }
         .scale-option {
             flex: 1;
@@ -33,16 +36,30 @@
             transition: all 0.3s ease;
             background: #F0E6D6;
             color: var(--text-soft);
+            font-weight: 500;
+        }
+        .scale-option:hover {
+            background: var(--accent-honey);
+            transform: scale(1.02);
         }
         .scale-option.selected {
             background: var(--accent-sage);
             color: white;
             transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(156, 175, 136, 0.3);
         }
-        .scale-label {
-            font-size: 12px;
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
             margin-top: 8px;
-            text-align: center;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .scale-label-left {
+            text-align: left;
+        }
+        .scale-label-right {
+            text-align: right;
         }
         .submit-btn {
             margin-top: 24px;
@@ -57,6 +74,15 @@
             margin-bottom: 20px;
             color: var(--accent-sage);
             text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
         }
     </style>
 </head>
@@ -68,7 +94,7 @@
                 <a href="dashboard.html">Dashboard</a>
                 <a href="journal.html">Journal</a>
                 <a href="chat.html">Chat</a>
-                <a href="mood.html">Wellbeing</a>
+                <a href="mood.html">Mood & Wellbeing</a>
                 <a href="settings.html">Settings</a>
                 <a href="#" onclick="logout()" style="color: #E8A598;">Logout</a>
             </div>
@@ -80,7 +106,7 @@
             <div class="loading">Loading questions...</div>
         </div>
 
-        <div id="submitSection" style="display: none;">
+        <div id="submitSection" style="display: none; margin-top: 20px;">
             <button id="submitBtn" class="submit-btn">Submit Assessment</button>
         </div>
     </div>
