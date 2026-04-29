@@ -15,10 +15,10 @@ class Chat:
         ]
         
         self.help_lines = [
-            "Samaritans: 116 123 (free, 24/7)",
-            "NHS 111: 111 (medical help)",
-            "Mind: 0300 123 3393",
-            "SHOUT: Text 85258"
+            "📞 **Samaritans**: 116 123 (free, 24/7) - [Visit Website](https://www.samaritans.org)",
+            "📞 **NHS 111**: 111 (medical help) - [NHS Mental Health](https://www.nhs.uk/mental-health)",
+            "📞 **Mind**: 0300 123 3393 - [Visit Mind Website](https://www.mind.org.uk)",
+            "📞 **SHOUT**: Text 85258 - [Visit SHOUT](https://www.giveusashout.org)"
         ]
         
         # ============================================
@@ -162,6 +162,34 @@ class Chat:
             "That sounds like a lot to carry. How are you holding up?",
             "I really appreciate you sharing that. What would support look like for you right now?"
         ]
+
+        self.activities = {
+            "anxious": [
+                "🧘 Try this 5-minute guided breathing exercise: [Calm Breathing](https://www.calm.com/breathe)",
+                "📝 Write down what's worrying you - here's a [guided journal template](https://www.therapistaid.com/therapy-worksheet/anxiety-journal)",
+                "🎵 Listen to calming music: [Lo-Fi Study Beats](https://www.youtube.com/watch?v=jfKfPfyJRdk)"
+            ],
+            "sad": [
+                "🌱 Try this self-care checklist: [Mind Self-Care Guide](https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing)",
+                "📖 Read something uplifting: [Short Stories for Difficult Times](https://www.shortstoryguide.com/uplifting-short-stories/)",
+                "🎬 Watch something comforting: [Movies That Make You Feel Good](https://www.imdb.com/list/ls000032679/)"
+            ],
+            "stressed": [
+                "💪 Here's a quick stress-busting workout: [7-Minute Workout](https://www.nytimes.com/2016/05/08/well/move/the-scientific-7-minute-workout.html)",
+                "🍵 Take a tea break. Here's a guide to [mindful drinking](https://www.mindful.org/how-to-practice-mindful-drinking/)",
+                "📵 Try a digital detox: [How to Take a Break from Screens](https://www.healthline.com/health/digital-detox)"
+            ],
+            "lonely": [
+                "🤝 Connect with others: [Meetup Groups Near You](https://www.meetup.com)",
+                "💬 Try a peer support community: [Side by Side - Mind](https://www.mind.org.uk/information-support/side-by-side)",
+                "🐾 Consider pet therapy: [How Pets Help Mental Health](https://www.nhs.uk/mental-health/self-help/tips-and-support/nature-and-mental-health/)"
+            ],
+            "general": [
+                "🌿 10-minute nature meditation: [Forest Bathing Guide](https://www.nhs.uk/mental-health/self-help/tips-and-support/nature-and-mental-health/)",
+                "📚 Read about wellbeing: [Mental Health Foundation Resources](https://www.mentalhealth.org.uk/explore-mental-health/publications)",
+                "🎯 Set a small goal today: [SMART Goal Template](https://www.mindtools.com/page6.html)"
+            ]
+        }
         
         # ============================================
         # NAME RECOGNITION RESPONSES (6 variations)
@@ -378,3 +406,37 @@ class Chat:
             return random.choice(self.followup_responses).format(topic=self.last_topic), "followup", None
         
         return random.choice(self.default_responses), "default", None
+    
+    async def get_journal_context(self, user_id: str, db: AsyncSession) -> str: 
+        from app.models.journal import JournalEntry
+        from sqlalchemy import select, desc
+    
+        result = await db.execute(
+        select(JournalEntry)
+        .where(JournalEntry.user_id == user_id)
+        .order_by(desc(JournalEntry.created_at))
+        .limit(3)
+        )
+        entries = result.scalars().all()
+    
+        if not entries:
+            return ""
+    
+        # Extract topics from journals
+        topics = []
+        for entry in entries:
+            content = entry.encrypted_content.lower()
+            if "stress" in content or "anxious" in content:
+                topics.append("stress and anxiety")
+            if "work" in content or "job" in content:
+                topics.append("work")
+            if "exam" in content or "study" in content:
+                topics.append("exams")
+            if "friend" in content or "family" in content:
+                topics.append("relationships")
+    
+        if topics:
+            unique_topics = list(set(topics))
+            return f"I noticed from your journal that you've been dealing with {', '.join(unique_topics)}. Would you like to talk about that?"
+    
+        return ""

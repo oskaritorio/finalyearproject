@@ -1,30 +1,29 @@
 category,question_focus,score_min,score_max,tip
-general,excellent,4.5,5.0,You're thriving! Keep up your great habits - they're working well.
-general,excellent,4.5,5.0,Share what's working with someone who might benefit from your experience.
-general,good,3.5,4.49,You're doing well. Try adding one new positive activity to your routine.
-general,good,3.5,4.49,Small improvements can make a big difference over time.
-general,moderate,2.5,3.49,You're managing. Focus on small,positive steps each day.
-general,moderate,2.5,3.49,Even a 5-minute walk or calling a friend can help lift your mood.
-general,moderate,2.5,3.49,Try writing down one small win each day to build momentum.
-general,concerning,1.5,2.49,Your wellbeing matters. Consider talking to someone you trust.
-general,concerning,1.5,2.49,You don't have to go through this alone. Reach out for support.
-general,critical,1.0,1.49,Please reach out for support immediately. You deserve help.
-general,critical,1.0,1.49,Your safety matters. Talk to a professional who can help.
-optimistic,optimistic,1,2,Try writing down one good thing that happened today.
-optimistic,optimistic,3,5,Keep nurturing your positive outlook - it's a real strength.
-useful,useful,1,2,Help someone with a small task today - it boosts purpose.
-useful,useful,3,5,Your sense of purpose is valuable. Keep finding meaning in daily life.
-relaxed,relaxed,1,2,Try this: breathe in for 4 seconds,hold for 4,out for 4.
-relaxed,relaxed,3,5,You're managing stress well. Consider adding a weekly relaxation ritual.
-dealing,dealing,1,2,Break problems into smaller steps. What's the smallest action?
-dealing,dealing,3,5,You're handling challenges well. Remember past successes.
-thinking,thinking,1,2,Take a 5-minute walk to clear your mind. Fresh air helps.
-thinking,thinking,3,5,Your mental clarity is good. Try learning something new.
-close,close,1,2,Send one message to someone today,"even just ""hello""."
-close,close,3,5,Your social connections are strong. Nurture them with a small gesture.
-decisions,decisions,1,2,Make one small decision today without overthinking it.
-decisions,decisions,3,5,Your decision-making is solid. Trust yourself more often.
-interest,interest,1,2,Try one small activity you used to enjoy for just 5 minutes.
-interest,interest,3,5,You're engaged in life. Consider sharing an interest with someone else.
-depressed,depressed,3,5,You're not alone. Talking to someone you trust can help.
-depressed,depressed,1,2,Please reach out for professional support. You deserve care.
+general,excellent,4.5,5.0,You're thriving! Keep up your great habits. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/' target='_blank'>NHS wellbeing guides →</a>
+general,excellent,4.5,5.0,Share what's working with someone who might benefit. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/' target='_blank'>More wellbeing tips →</a>
+general,good,3.5,4.49,You're doing well. <a href='https://www.nhs.uk/every-mind-matters/' target='_blank'>Every Mind Matters →</a>
+general,good,3.5,4.49,Small improvements make a difference. <a href='https://www.mentalhealth.org.uk/explore-mental-health/publications/kindness-and-mental-health' target='_blank'>Kindness and mental health →</a>
+general,moderate,2.5,3.49,Focus on small steps. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/tips-for-low-mood/' target='_blank'>Tips for low mood →</a>
+general,moderate,2.5,3.49,Even a 5-minute walk helps. <a href='https://www.nhs.uk/live-well/exercise/physical-activity-guidelines-walking-and-health/' target='_blank'>Walking for health →</a>
+general,concerning,1.5,2.49,Your wellbeing matters. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Crisis support services →</a>
+general,concerning,1.5,2.49,You don't have to go through this alone. <a href='https://www.samaritans.org/how-we-can-help/contact-samaritan/' target='_blank'>Talk to Samaritans →</a>
+general,critical,1.0,1.49,Please reach out for support. <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>NHS mental health services →</a>
+general,critical,1.0,1.49,Your safety matters. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Find help now →</a>
+optimistic,optimistic,1,2,Try writing down one good thing today. <a href='https://www.positivepsychology.com/gratitude-journal/' target='_blank'>Gratitude journal guide →</a>
+optimistic,optimistic,3,5,Keep nurturing your positive outlook. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mood-self-assessment/' target='_blank'>Check your mood →</a>
+useful,useful,1,2,Help someone with a small task. <a href='https://www.mentalhealth.org.uk/explore-mental-health/kindness' target='_blank'>The power of kindness →</a>
+useful,useful,3,5,Your sense of purpose matters. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/wellbeing/' target='_blank'>Find your purpose →</a>
+relaxed,relaxed,1,2,Try 4-7-8 breathing. <a href='https://www.healthline.com/health/4-7-8-breathing' target='_blank'>Breathing technique guide →</a>
+relaxed,relaxed,3,5,You're managing stress well. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank'>More stress-busting tips →</a>
+dealing,dealing,1,2,Break problems into smaller steps. <a href='https://www.mindtools.com/pages/article/personal-problem-solving.htm' target='_blank'>Problem-solving guide →</a>
+dealing,dealing,3,5,You're handling challenges well. <a href='https://www.verywellmind.com/coping-skills-for-stress-3144949' target='_blank'>Coping strategies →</a>
+thinking,thinking,1,2,Take a 5-minute walk. <a href='https://www.nhs.uk/live-well/exercise/walking-for-health/' target='_blank'>Walking benefits →</a>
+thinking,thinking,3,5,Keep learning something new. <a href='https://www.bbc.co.uk/bitesize/articles/znbj2v4' target='_blank'>Brain training activities →</a>
+close,close,1,2,Send a message to someone today. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/friendship-and-mental-health/' target='_blank'>Friendship and mental health →</a>
+close,close,3,5,Your social connections are strong. <a href='https://www.mentalhealth.org.uk/explore-mental-health/relationships' target='_blank'>Building relationships →</a>
+decisions,decisions,1,2,Make one small decision today. <a href='https://www.mindtools.com/pages/article/newTED_00.htm' target='_blank'>Decision-making guide →</a>
+decisions,decisions,3,5,Trust yourself more. <a href='https://www.psychologytoday.com/gb/blog/the-science-success/202101/5-ways-boost-your-confidence' target='_blank'>Build confidence →</a>
+interest,interest,1,2,Try one small activity you used to enjoy. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/' target='_blank'>Find new interests →</a>
+interest,interest,3,5,Share an interest with someone else. <a href='https://www.meetup.com' target='_blank'>Find local groups →</a>
+depressed,depressed,3,5,You're not alone. <a href='https://www.samaritans.org/' target='_blank'>Samaritans 116 123 →</a>
+depressed,depressed,1,2,Please reach out. <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>Get help now →</a>

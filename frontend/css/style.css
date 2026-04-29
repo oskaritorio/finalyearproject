@@ -112,6 +112,73 @@ body {
     border: 1px solid rgba(156, 175, 136, 0.1);
 }
 
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+    max-width: 350px;
+}
+
+.toast-success {
+    border-left: 4px solid #9CAF88;
+}
+.toast-error {
+    border-left: 4px solid #E53E3E;
+}
+.toast-info {
+    border-left: 4px solid #4A90D9;
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+    color: #5C4B3A;
+}
+
+.toast-close {
+    cursor: pointer;
+    font-size: 20px;
+    color: #A0AEC0;
+}
+
+.toast.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
 .card:hover, .create-card:hover, .entries-list:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-hover);

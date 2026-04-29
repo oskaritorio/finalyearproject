@@ -24,6 +24,8 @@ class ChatResponse(BaseModel):
     category: str
     crisis_help: list | None = None
 
+
+
 @router.post("/", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
@@ -37,6 +39,11 @@ async def chat(
         .order_by(ChatSession.started_at.desc())
     )
     session = result.scalar_one_or_none()
+
+    if not context:  
+        journal_context = await chatbot.get_journal_context(current_user.id, db)
+        if journal_context:
+            reply_text = journal_context
     
     if not session:
         session = ChatSession(id=str(uuid.uuid4()), user_id=current_user.id)
@@ -242,3 +249,15 @@ async def delete_all_sessions(
     await db.commit()
     
     return {"message": f"Deleted {len(sessions)} sessions"}
+
+@router.get("/activity")
+async def get_activity_suggestion(category: str = "general"):
+    """Get activity suggestion with hyperlink"""
+    suggestions = {
+        "anxious": "Try this 5-minute guided breathing exercise: [Calm Breathing](https://www.calm.com/breathe)",
+        "sad": "Try this self-care checklist: [Mind Self-Care Guide](https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing)",
+        "stressed": "Here's a quick stress-busting workout: [7-Minute Workout](https://www.nytimes.com/2016/05/08/well/move/the-scientific-7-minute-workout.html)",
+        "lonely": "Connect with others: [Meetup Groups Near You](https://www.meetup.com)",
+        "general": "10-minute nature meditation: [Forest Bathing Guide](https://www.nhs.uk/mental-health/self-help/tips-and-support/nature-and-mental-health/)"
+    }
+    return {"activity": suggestions.get(category, suggestions["general"])}
