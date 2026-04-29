@@ -1,23 +1,25 @@
 // ========================================
-// WELLBEING ASSESSMENT
-// Handles the 9-question wellbeing questionnaire
+// WELLBEING ASSESSMENT - WITH SCALE LABELS
 // ========================================
 
 let currentQuestions = [];
 let userResponses = {};
 
-// Helper function to get auth header
 function getAuth() {
     const auth = localStorage.getItem('auth');
     return auth ? { 'Authorization': 'Basic ' + auth } : {};
 }
 
-// Helper function to check if logged in
 function isLoggedIn() {
     return localStorage.getItem('user') !== null;
 }
 
-// Load questions from backend
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 async function loadQuestions() {
     const container = document.getElementById('questionsContainer');
     if (!container) return;
@@ -44,7 +46,6 @@ async function loadQuestions() {
     }
 }
 
-// Render all questions on the page
 function renderQuestions() {
     const container = document.getElementById('questionsContainer');
     if (!container) return;
@@ -63,26 +64,25 @@ function renderQuestions() {
         <div class="card">
             <h3 class="section-title">How have you been feeling?</h3>
             <p>Rate each statement for the <strong>past two weeks</strong>.</p>
-            <p style="font-size: 14px; color: var(--text-light);">1 = None of the time &nbsp;&nbsp;&nbsp; 5 = All of the time</p>
         </div>
     `;
     
     // SWEMWBS Questions
     if (swemwbsQuestions.length > 0) {
-        html += '<div class="card"><h3>General Wellbeing</h3>';
+        html += `<div class="card"><h3>General Wellbeing</h3>`;
         for (const q of swemwbsQuestions) {
             html += renderQuestionCard(q);
         }
-        html += '</div>';
+        html += `</div>`;
     }
     
     // PHQ-2 Questions
     if (phq2Questions.length > 0) {
-        html += '<div class="card"><h3>How often have you been bothered by...</h3>';
+        html += `<div class="card"><h3>How often have you been bothered by...</h3>`;
         for (const q of phq2Questions) {
             html += renderQuestionCard(q);
         }
-        html += '</div>';
+        html += `</div>`;
     }
     
     container.innerHTML = html;
@@ -91,32 +91,34 @@ function renderQuestions() {
     const submitSection = document.getElementById('submitSection');
     if (submitSection) submitSection.style.display = 'block';
     
-    // Attach event listeners to all scale options
+    // Attach event listeners
     attachScaleListeners();
 }
 
-// Render a single question card
-// Render a single question card with proper label positions
 function renderQuestionCard(q) {
     return `
         <div class="question-card" data-question-id="${q.id}">
             <div class="question-text">${escapeHtml(q.text)}</div>
-            <div class="scale">
-                <div class="scale-option" data-value="1">1</div>
-                <div class="scale-option" data-value="2">2</div>
-                <div class="scale-option" data-value="3">3</div>
-                <div class="scale-option" data-value="4">4</div>
-                <div class="scale-option" data-value="5">5</div>
-            </div>
-            <div class="scale-labels">
-                <span class="scale-label-left">None of the time</span>
-                <span class="scale-label-right">All of the time</span>
+            <div class="scale-container">
+                <div class="scale">
+                    <div class="scale-option" data-value="1">1</div>
+                    <div class="scale-option" data-value="2">2</div>
+                    <div class="scale-option" data-value="3">3</div>
+                    <div class="scale-option" data-value="4">4</div>
+                    <div class="scale-option" data-value="5">5</div>
+                </div>
+                <div class="scale-labels">
+                    <span>Strongly<br>Disagree</span>
+                    <span>Disagree</span>
+                    <span>Neutral</span>
+                    <span>Agree</span>
+                    <span>Strongly<br>Agree</span>
+                </div>
             </div>
         </div>
     `;
 }
 
-// Attach click listeners to scale options
 function attachScaleListeners() {
     const allScaleOptions = document.querySelectorAll('.scale-option');
     
@@ -126,7 +128,6 @@ function attachScaleListeners() {
     });
 }
 
-// Handle click on a scale option
 function handleScaleClick(event) {
     const option = event.currentTarget;
     const value = parseInt(option.getAttribute('data-value'));
@@ -146,9 +147,7 @@ function handleScaleClick(event) {
     console.log('Answered ' + questionId + ': ' + value);
 }
 
-// Submit the assessment
 async function submitAssessment() {
-    // Check if all questions are answered
     const expectedIds = currentQuestions.map(q => q.id);
     const missingIds = expectedIds.filter(id => !userResponses[id]);
     
@@ -194,16 +193,7 @@ async function submitAssessment() {
     }
 }
 
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Initialise the wellbeing page
 function initWellbeing() {
-    // Check if user is logged in using localStorage
     if (!localStorage.getItem('user')) {
         window.location.href = 'index.html';
         return;
@@ -217,7 +207,7 @@ function initWellbeing() {
     }
 }
 
-// Auto-initialise if this script is loaded on wellbeing page
+// Auto-initialise
 if (document.getElementById('questionsContainer')) {
     initWellbeing();
 }

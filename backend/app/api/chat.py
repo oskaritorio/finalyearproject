@@ -24,6 +24,7 @@ class ChatResponse(BaseModel):
     category: str
     crisis_help: list | None = None
 
+
 @router.post("/", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
@@ -39,16 +40,19 @@ async def chat(
     session = result.scalar_one_or_none()
     
     if not session:
-        session = ChatSession(id=str(uuid.uuid4()), user_id=current_user.id)
+        session = ChatSession(
+            id=str(uuid.uuid4()),
+            user_id=current_user.id
+        )
         db.add(session)
         await db.flush()
     
-    # Get last 5 messages for context (ALWAYS define context)
+    # Get last 3 messages for context
     msg_result = await db.execute(
         select(Message)
         .where(Message.session_id == session.id)
         .order_by(Message.timestamp.desc())
-        .limit(5)
+        .limit(3)
     )
     last_msgs = msg_result.scalars().all()
     context = [{"sender": m.sender, "content": m.content} for m in reversed(last_msgs)]
@@ -62,31 +66,8 @@ async def chat(
     )
     db.add(user_msg)
     
-    # Check if this is first message (no context yet)
-    is_first_message = len(context) == 0
-    
     # Get reply
     reply_text, category, crisis_help = chatbot.get_reply(request.message, context)
-    
-    # If first message, try to add journal context
-    if is_first_message:
-        try:
-            journal_context = await chatbot.get_journal_context(current_user.id, db)
-            if journal_context:
-                # Send journal context as a separate message
-                journal_reply = journal_context
-                journal_msg = Message(
-                    id=str(uuid.uuid4()),
-                    session_id=session.id,
-                    sender="bot",
-                    content=journal_reply
-                )
-                db.add(journal_msg)
-                # Return journal context instead of normal reply
-                reply_text = journal_reply
-                category = "context"
-        except Exception as e:
-            print(f"Error getting journal context: {e}")
     
     if category == "CRISIS":
         session.crisis_detected = True
@@ -108,11 +89,13 @@ async def chat(
         "crisis_help": crisis_help
     }
 
+
 @router.get("/history")
 async def get_history(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    """Get all chat sessions for the current user"""
     result = await db.execute(
         select(ChatSession)
         .where(ChatSession.user_id == current_user.id)
@@ -132,7 +115,57 @@ async def get_history(
             "session_id": s.id,
             "started_at": s.started_at,
             "crisis_detected": s.crisis_detected,
-            "messages": [{"sender": m.sender, "content": m.content, "timestamp": m.timestamp} for m in msgs]
+            "messages": [
+                {"sender": m.sender, "content": m.content, "timestamp": m.timestamp}
+                for m in msgs
+            ]
         })
     
     return {"sessions": history}
+
+
+# ============================================
+# DELETE CHAT HISTORY ENDPOINTS
+# ============================================
+
+@router.delete("/session/{session_id}")
+async def delete_session(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete a single chat session"""
+    result = await db.execute(
+        select(ChatSession).where(
+            ChatSession.id == session_id,
+            ChatSession.user_id == current_user.id
+        )
+    )
+    session = result.scalar_one_or_none()
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    await db.delete(session)
+    await db.commit()
+    
+    return {"message": "Session deleted"}
+
+
+@router.delete("/all")
+async def delete_all_sessions(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete ALL chat sessions for the current user"""
+    result = await db.execute(
+        select(ChatSession).where(ChatSession.user_id == current_user.id)
+    )
+    sessions = result.scalars().all()
+    
+    for session in sessions:
+        await db.delete(session)
+    
+    await db.commit()
+    
+    return {"message": f"Deleted {len(sessions)} sessions"}

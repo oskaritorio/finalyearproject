@@ -1,16 +1,23 @@
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import logging
 
 from app.api import journal, mood, chat, user, wellbeing
 from app.auth import routes as auth_routes
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger.info("Starting up...")
     from app.models.base import engine, Base
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database ready")
     yield
+    logger.info("Shutting down...")
     await engine.dispose()
 
 app = FastAPI(
@@ -19,14 +26,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"], 
+    allow_headers=["*"],
 )
-
 
 # Register routes
 app.include_router(auth_routes.router)

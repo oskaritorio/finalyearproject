@@ -41,6 +41,38 @@
             display: block;
             margin-bottom: 12px;
         }
+        .breathing-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .breathing-modal.active { display: flex; }
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            background: #9CAF88;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: breathe 8s ease-in-out infinite;
+            color: white;
+            font-size: 20px;
+            text-align: center;
+            padding: 20px;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -51,7 +83,7 @@
                 <a href="dashboard.html" class="active">Dashboard</a>
                 <a href="journal.html">Journal</a>
                 <a href="chat.html">Chat</a>
-                <a href="mood.html">Mood</a>
+                <a href="mood.html">Wellbeing</a>
                 <a href="settings.html">Settings</a>
                 <a href="#" class="logout-link" onclick="logout()">Logout</a>
             </div>
@@ -60,7 +92,7 @@
             <h2>Welcome back, <span id="username"></span>! 🌸</h2>
             <p>Your safe space for reflection and growth</p>
         </div>
-        
+
         <div class="quick-links">
             <a href="journal.html" class="quick-link-card">
                 <span class="icon">📝</span>
@@ -78,6 +110,18 @@
                 <p>Track your feelings</p>
             </a>
         </div>
+        
+        <div class="quote-api-card" id="dailyQuoteCard">
+            <div class="quote-icon"></div>
+            <div class="quote-text">Loading daily inspiration...</div>
+            <div class="quote-author"></div>
+        </div>
+
+        <div class="breathing-card" onclick="startBreathing()">
+            <div class="breathing-icon">🧘</div>
+            <div class="breathing-text">Take a moment to breathe</div>
+            <div class="breathing-sub">A 30-second calming exercise</div>
+        </div>
     </div>
     
     <script src="js/api.js"></script>
@@ -88,5 +132,76 @@
         const user = getCurrentUser();
         if (user) document.getElementById('username').textContent = user.username;
     </script>
+
+
+    <script>
+    // Local quote library - works 100% of the time, no network needed
+    const quoteLibrary = [
+        { q: "You are stronger than you think.", a: "Unknown" },
+        { q: "Every day is a new beginning. Take a deep breath.", a: "Unknown" },
+        { q: "Small steps every day lead to big changes.", a: "Unknown" },
+        { q: "Be kind to yourself today. You're doing your best.", a: "MuseChum" },
+        { q: "It's okay to not be okay. You're not alone.", a: "Unknown" },
+        { q: "Progress, not perfection.", a: "Unknown" },
+        { q: "You've survived 100% of your bad days. You've got this.", a: "Unknown" },
+        { q: "Rest is productive. You don't have to earn it.", a: "MuseChum" },
+        { q: "The only way out is through.", a: "Robert Frost" },
+        { q: "This too shall pass.", a: "Persian proverb" },
+        { q: "You are enough just as you are.", a: "Unknown" },
+        { q: "Feel the fear and do it anyway.", a: "Susan Jeffers" },
+        { q: "One small positive thought can change your whole day.", a: "Zig Ziglar" }
+    ];
+
+// Get a random daily quote (changes each day based on date)
+    function loadDailyQuote() {
+    // Use date to get consistent quote for the whole day
+        const today = new Date().toDateString();
+        let hash = 0;
+        for (let i = 0; i < today.length; i++) {
+            hash = ((hash << 5) - hash) + today.charCodeAt(i);
+            hash |= 0;
+        }
+        const index = Math.abs(hash) % quoteLibrary.length;
+        const quote = quoteLibrary[index];
+    
+        document.querySelector('.quote-text').innerHTML = `"${quote.q}"`;
+        document.querySelector('.quote-author').innerHTML = `— ${quote.a}`;
+    }
+
+// Load quote when page loads
+    loadDailyQuote();
+    </script>
+
+    <script>
+    function startBreathing() {
+        const modal = document.createElement('div');
+        modal.className = 'breathing-modal';
+        modal.innerHTML = `
+            <div class="breathing-circle">
+                <div>Breathe In</div>
+                <div style="font-size: 12px; margin-top: 10px;">4 seconds</div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.classList.add('active');
+    
+        let step = 0;
+        const breaths = ['Breathe In', 'Hold', 'Breathe Out', 'Hold'];
+        const circle = modal.querySelector('.breathing-circle');
+    
+        const interval = setInterval(() => {
+            step = (step + 1) % 4;
+            circle.innerHTML = `<div>${breaths[step]}</div><div style="font-size: 12px; margin-top: 10px;">4 seconds</div>`;
+        }, 4000);
+    
+        setTimeout(() => {
+            clearInterval(interval);
+            modal.remove();
+        }, 32000);
+    }
+    </script>
+
+
+
 </body>
 </html>

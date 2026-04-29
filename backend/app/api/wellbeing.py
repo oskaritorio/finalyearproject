@@ -10,13 +10,9 @@ from app.services.wellbeing_service import (
     calculate_category, process_responses
 )
 
-# ============================================
-# ✅ THIS CREATES THE ROUTER - REQUIRED!
-# ============================================
 router = APIRouter(prefix="/wellbeing", tags=["wellbeing"])
 
 
-# Request/Response Models
 class AssessmentRequest(BaseModel):
     responses: Dict[str, int]
 
@@ -29,10 +25,6 @@ class AssessmentResponse(BaseModel):
     tips: List[str]
     date: str
 
-
-# ============================================
-# ENDPOINTS
-# ============================================
 
 @router.get("/questions")
 async def get_questions():
@@ -125,4 +117,48 @@ async def get_latest_assessment(
         "total_score": float(latest.get('total_score', 0)),
         "category": latest.get('category'),
         "tips": latest.get('tips_list', [])
+    }
+
+
+# ============================================
+# ✅ NEW: CHART DATA ENDPOINT
+# ============================================
+@router.get("/chart-data")
+async def get_chart_data(
+    current_user: User = Depends(get_current_user)
+):
+    """Get wellbeing scores over time for chart visualization"""
+    
+    history = WellbeingService.get_user_history(current_user.id)
+    
+    if not history:
+        return {"labels": [], "scores": [], "latest_score": 0, "latest_category": "N/A"}
+    
+    # Sort by date (oldest first for chart)
+    history.sort(key=lambda x: x.get('date', ''))
+    
+    labels = []
+    scores = []
+    
+    for item in history:
+        # Format date as DD/MM
+        date_str = item.get('date', '')
+        if date_str:
+            try:
+                date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+                labels.append(date_obj.strftime('%d/%m'))
+            except:
+                labels.append(date_str[:10])
+        else:
+            labels.append('Unknown')
+        
+        # Get total score (already calculated)
+        total_score = float(item.get('total_score', 0))
+        scores.append(round(total_score, 2))
+    
+    return {
+        "labels": labels,
+        "scores": scores,
+        "latest_score": scores[-1] if scores else 0,
+        "latest_category": history[-1].get('category', 'N/A') if history else 'N/A'
     }

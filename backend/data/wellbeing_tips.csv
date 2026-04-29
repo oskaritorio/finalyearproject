@@ -1,14 +1,14 @@
 category,question_focus,score_min,score_max,tip
-general,excellent,4.5,5.0,You're thriving! Keep up your great habits. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/' target='_blank'>NHS wellbeing guides →</a>
-general,excellent,4.5,5.0,Share what's working with someone who might benefit. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/' target='_blank'>More wellbeing tips →</a>
+general,excellent,4.5,5,You're thriving! Keep up your great habits. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/' target='_blank'>NHS wellbeing guides →</a>
+general,excellent,4.5,5,Share what's working with someone who might benefit. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/' target='_blank'>More wellbeing tips →</a>
 general,good,3.5,4.49,You're doing well. <a href='https://www.nhs.uk/every-mind-matters/' target='_blank'>Every Mind Matters →</a>
 general,good,3.5,4.49,Small improvements make a difference. <a href='https://www.mentalhealth.org.uk/explore-mental-health/publications/kindness-and-mental-health' target='_blank'>Kindness and mental health →</a>
-general,moderate,2.5,3.49,Focus on small steps. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/tips-for-low-mood/' target='_blank'>Tips for low mood →</a>
+general,moderate,2.5,3.49,Focus on small steps. <a href='https://www.nhs.uk/mental-health/self-help/' target='_blank'>Tips for low mood →</a>
 general,moderate,2.5,3.49,Even a 5-minute walk helps. <a href='https://www.nhs.uk/live-well/exercise/physical-activity-guidelines-walking-and-health/' target='_blank'>Walking for health →</a>
 general,concerning,1.5,2.49,Your wellbeing matters. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Crisis support services →</a>
 general,concerning,1.5,2.49,You don't have to go through this alone. <a href='https://www.samaritans.org/how-we-can-help/contact-samaritan/' target='_blank'>Talk to Samaritans →</a>
-general,critical,1.0,1.49,Please reach out for support. <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>NHS mental health services →</a>
-general,critical,1.0,1.49,Your safety matters. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Find help now →</a>
+general,critical,1,1.49,Please reach out for support. <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>NHS mental health services →</a>
+general,critical,1,1.49,Your safety matters. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Find help now →</a>
 optimistic,optimistic,1,2,Try writing down one good thing today. <a href='https://www.positivepsychology.com/gratitude-journal/' target='_blank'>Gratitude journal guide →</a>
 optimistic,optimistic,3,5,Keep nurturing your positive outlook. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mood-self-assessment/' target='_blank'>Check your mood →</a>
 useful,useful,1,2,Help someone with a small task. <a href='https://www.mentalhealth.org.uk/explore-mental-health/kindness' target='_blank'>The power of kindness →</a>

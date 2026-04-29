@@ -12,6 +12,7 @@
             border-radius: 24px;
             padding: 24px;
             margin-bottom: 24px;
+            box-shadow: var(--shadow-soft);
         }
         .quick-mood {
             display: flex;
@@ -76,6 +77,54 @@
         .category-moderate { background: #ECC94B; color: #5C4B3A; }
         .category-concerning { background: #ED8936; color: white; }
         .category-critical { background: #E53E3E; color: white; }
+        .chart-card {
+            background: var(--card-warm);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-soft);
+        }
+        .chart-stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .stat-badge {
+            background: #F0E6D6;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+        .stat-label {
+            color: var(--text-light);
+        }
+        .stat-value-chart {
+            font-weight: bold;
+            color: var(--accent-sage);
+            margin-left: 8px;
+        }
+        .chart-info {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        canvas {
+            max-height: 300px;
+            width: 100%;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+        }
     </style>
 </head>
 <body>
@@ -92,7 +141,7 @@
             </div>
         </div>
 
-        <!-- Quick Mood Check-in -->
+    
         <div class="section-card">
             <h2>😊 How are you feeling right now?</h2>
             <div class="quick-mood">
@@ -105,7 +154,7 @@
             <div id="quickMoodMessage" style="text-align: center; margin-top: 12px; color: var(--text-light);"></div>
         </div>
 
-        <!-- Deep Wellbeing Assessment -->
+    
         <div class="section-card">
             <div class="wellbeing-preview">
                 <h3>🌿 Take a Deeper Look</h3>
@@ -132,7 +181,27 @@
             </div>
         </div>
 
-        <!-- Recent Wellbeing History -->
+
+        <div class="chart-card">
+            <h3>📈 Your Wellbeing Trend</h3>
+            <p class="chart-info">Based on your completed wellbeing assessments (SWEMWBS + PHQ-2)</p>
+            <canvas id="wellbeingChart" width="400" height="200"></canvas>
+            <div id="chartStats" class="chart-stats">
+                <div class="stat-badge">
+                    <span class="stat-label">Latest Score:</span>
+                    <span class="stat-value-chart" id="latestScore">--</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">Category:</span>
+                    <span class="stat-value-chart" id="latestCategory">--</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">Total Assessments:</span>
+                    <span class="stat-value-chart" id="totalAssessments">0</span>
+                </div>
+            </div>
+        </div>
+
         <div class="section-card">
             <h3>📊 Recent Wellbeing Checks</h3>
             <div id="historyContainer" class="history-list">
@@ -146,6 +215,7 @@
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         
         function getAuth() {
@@ -163,7 +233,9 @@
             window.location.href = 'index.html';
         }
         
-        // Quick mood logging
+        // ============================================
+        // QUICK MOOD LOGGING
+        // ============================================
         document.querySelectorAll('.quick-mood-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const mood = parseInt(btn.getAttribute('data-mood'));
@@ -180,24 +252,122 @@
                     });
                     
                     if (response.ok && messageDiv) {
-                        messageDiv.innerHTML = '✅ Mood logged!';
+                        messageDiv.innerHTML = '✅ Mood logged! Keep up the great work.';
                         messageDiv.style.color = '#9CAF88';
                         setTimeout(() => { messageDiv.innerHTML = ''; }, 2000);
                     } else if (response.status === 400 && messageDiv) {
-                        messageDiv.innerHTML = '📅 Already logged today';
+                        messageDiv.innerHTML = '📅 You already logged your mood today. Come back tomorrow!';
                         messageDiv.style.color = '#E8A598';
                         setTimeout(() => { messageDiv.innerHTML = ''; }, 2000);
                     }
                 } catch (error) {
                     if (messageDiv) {
-                        messageDiv.innerHTML = '❌ Cannot connect';
+                        messageDiv.innerHTML = '❌ Cannot connect to server';
                         setTimeout(() => { messageDiv.innerHTML = ''; }, 2000);
                     }
                 }
             });
         });
         
-        // Load latest wellbeing
+        // ============================================
+        // WELLBEING CHART
+        // ============================================
+        async function loadWellbeingChart() {
+            const canvas = document.getElementById('wellbeingChart');
+            if (!canvas) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/wellbeing/chart-data`, {
+                    headers: getAuth()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.labels && data.labels.length > 0) {
+                        const ctx = canvas.getContext('2d');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: 'Wellbeing Score (1-5)',
+                                    data: data.scores,
+                                    borderColor: '#9CAF88',
+                                    backgroundColor: 'rgba(156, 175, 136, 0.1)',
+                                    borderWidth: 3,
+                                    pointRadius: 6,
+                                    pointBackgroundColor: '#9CAF88',
+                                    pointBorderColor: 'white',
+                                    pointBorderWidth: 2,
+                                    tension: 0.3,
+                                    fill: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                scales: {
+                                    y: {
+                                        min: 1,
+                                        max: 5,
+                                        title: {
+                                            display: true,
+                                            text: 'Wellbeing Score',
+                                            color: '#8B7A6B'
+                                        },
+                                        grid: {
+                                            color: '#F0E6D6'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Assessment Date',
+                                            color: '#8B7A6B'
+                                        },
+                                        grid: {
+                                            display: false
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `Score: ${context.raw} / 5`;
+                                            }
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            color: '#5C4B3A'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Update stats
+                        document.getElementById('latestScore').textContent = data.latest_score;
+                        document.getElementById('latestCategory').textContent = data.latest_category;
+                        document.getElementById('totalAssessments').textContent = data.labels.length;
+                    } else {
+                        canvas.parentElement.innerHTML = '<div class="empty-state">📊 Complete a wellbeing assessment to see your chart!</div>';
+                    }
+                } else {
+                    canvas.parentElement.innerHTML = '<div class="empty-state">📊 Complete a wellbeing assessment to see your chart!</div>';
+                }
+            } catch (error) {
+                console.error('Chart error:', error);
+                canvas.parentElement.innerHTML = '<div class="empty-state">📊 Complete a wellbeing assessment to see your chart!</div>';
+            }
+        }
+        
+        // ============================================
+        // LATEST WELLBEING
+        // ============================================
         async function loadLatestWellbeing() {
             try {
                 const response = await fetch(API_URL + '/wellbeing/latest', {
@@ -218,11 +388,13 @@
                     }
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error loading latest wellbeing:', error);
             }
         }
         
-        // Load history
+        // ============================================
+        // WELLBEING HISTORY
+        // ============================================
         async function loadHistory() {
             const container = document.getElementById('historyContainer');
             if (!container) return;
@@ -235,7 +407,7 @@
                 if (response.ok) {
                     const history = await response.json();
                     if (history.length === 0) {
-                        container.innerHTML = '<div class="empty-state">No assessments yet</div>';
+                        container.innerHTML = '<div class="empty-state">No wellbeing assessments yet. Take your first one!</div>';
                         return;
                     }
                     
@@ -248,12 +420,13 @@
                     };
                     
                     let html = '';
-                    for (let i = 0; i < Math.min(history.length, 3); i++) {
+                    for (let i = 0; i < Math.min(history.length, 5); i++) {
                         const item = history[i];
+                        const date = new Date(item.date).toLocaleDateString();
                         html += `
                             <div class="history-item">
                                 <div>
-                                    <strong>${new Date(item.date).toLocaleDateString()}</strong>
+                                    <strong>${date}</strong>
                                     <br>
                                     <small>Score: ${item.total_score}/5</small>
                                 </div>
@@ -263,14 +436,17 @@
                     }
                     container.innerHTML = html;
                 } else {
-                    container.innerHTML = '<div class="empty-state">Failed to load</div>';
+                    container.innerHTML = '<div class="empty-state">Failed to load history</div>';
                 }
             } catch (error) {
-                container.innerHTML = '<div class="empty-state">Cannot connect</div>';
+                console.error('Error loading history:', error);
+                container.innerHTML = '<div class="empty-state">Cannot connect to server</div>';
             }
         }
         
-        // Take assessment button
+        // ============================================
+        // TAKE ASSESSMENT BUTTON
+        // ============================================
         const takeBtn = document.getElementById('takeAssessmentBtn');
         if (takeBtn) {
             takeBtn.addEventListener('click', () => {
@@ -278,8 +454,12 @@
             });
         }
         
+        // ============================================
+        // INITIALISE PAGE
+        // ============================================
         loadLatestWellbeing();
         loadHistory();
+        loadWellbeingChart();
     </script>
 </body>
 </html>
