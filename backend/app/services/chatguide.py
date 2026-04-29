@@ -284,15 +284,8 @@ class Chat:
             if word in msg_lower:
                 return True
         return False
-    
-    # ============================================
-    # Main reply function
-    # ============================================
+
     def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
-        
-        # ============================================
-        # SAFETY FIRST - HIGHEST PRIORITY
-        # ============================================
         if self.is_crisis(message):
             return (
                 "I'm really concerned about what you're sharing. Your safety is the most important thing. "
