@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
@@ -9,12 +9,12 @@ from app.models.base import get_db
 from app.models.chat import ChatSession, Message
 from app.models.user import User
 from app.auth.auth import get_current_user
-from app.services.chatguide import Chat 
+from app.services.chatguide import Chat
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-
-chatbot = Chat()  
+# Create chatbot instance
+chatbot = Chat()
 
 class ChatRequest(BaseModel):
     message: str
@@ -23,8 +23,6 @@ class ChatResponse(BaseModel):
     reply: str
     category: str
     crisis_help: list | None = None
-
-
 
 @router.post("/", response_model=ChatResponse)
 async def chat(
@@ -39,18 +37,13 @@ async def chat(
         .order_by(ChatSession.started_at.desc())
     )
     session = result.scalar_one_or_none()
-
-    if not context:  
-        journal_context = await chatbot.get_journal_context(current_user.id, db)
-        if journal_context:
-            reply_text = journal_context
     
     if not session:
         session = ChatSession(id=str(uuid.uuid4()), user_id=current_user.id)
         db.add(session)
         await db.flush()
     
-    # Get last 5 messages for context
+    # Get last 5 messages for context (ALWAYS define context)
     msg_result = await db.execute(
         select(Message)
         .where(Message.session_id == session.id)
@@ -69,8 +62,31 @@ async def chat(
     )
     db.add(user_msg)
     
-    # Get bot reply
+    # Check if this is first message (no context yet)
+    is_first_message = len(context) == 0
+    
+    # Get reply
     reply_text, category, crisis_help = chatbot.get_reply(request.message, context)
+    
+    # If first message, try to add journal context
+    if is_first_message:
+        try:
+            journal_context = await chatbot.get_journal_context(current_user.id, db)
+            if journal_context:
+                # Send journal context as a separate message
+                journal_reply = journal_context
+                journal_msg = Message(
+                    id=str(uuid.uuid4()),
+                    session_id=session.id,
+                    sender="bot",
+                    content=journal_reply
+                )
+                db.add(journal_msg)
+                # Return journal context instead of normal reply
+                reply_text = journal_reply
+                category = "context"
+        except Exception as e:
+            print(f"Error getting journal context: {e}")
     
     if category == "CRISIS":
         session.crisis_detected = True
@@ -120,144 +136,3 @@ async def get_history(
         })
     
     return {"sessions": history}
-@router.get("/export/all")
-async def export_all_chats(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Export all chat sessions as JSON"""
-    result = await db.execute(
-        select(ChatSession)
-        .where(ChatSession.user_id == current_user.id)
-        .order_by(ChatSession.started_at.desc())
-    )
-    sessions = result.scalars().all()
-    
-    export_data = {
-        "user": current_user.username,
-        "exported_at": datetime.utcnow().isoformat(),
-        "sessions": []
-    }
-    
-    for session in sessions:
-        msg_result = await db.execute(
-            select(Message)
-            .where(Message.session_id == session.id)
-            .order_by(Message.timestamp)
-        )
-        messages = msg_result.scalars().all()
-        
-        export_data["sessions"].append({
-            "session_id": session.id,
-            "started_at": session.started_at.isoformat(),
-            "crisis_detected": session.crisis_detected,
-            "messages": [
-                {
-                    "sender": m.sender,
-                    "content": m.content,
-                    "timestamp": m.timestamp.isoformat()
-                }
-                for m in messages
-            ]
-        })
-    
-    return export_data
-
-@router.get("/export/{session_id}")
-async def export_session(
-    session_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Export a single chat session"""
-    result = await db.execute(
-        select(ChatSession)
-        .where(
-            ChatSession.id == session_id,
-            ChatSession.user_id == current_user.id
-        )
-    )
-    session = result.scalar_one_or_none()
-    
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    msg_result = await db.execute(
-        select(Message)
-        .where(Message.session_id == session.id)
-        .order_by(Message.timestamp)
-    )
-    messages = msg_result.scalars().all()
-    
-    return {
-        "session_id": session.id,
-        "started_at": session.started_at.isoformat(),
-        "crisis_detected": session.crisis_detected,
-        "messages": [
-            {
-                "sender": m.sender,
-                "content": m.content,
-                "timestamp": m.timestamp.isoformat()
-            }
-            for m in messages
-        ]
-    }
-
-# ============================================
-# NEW: DELETE ENDPOINTS
-# ============================================
-
-@router.delete("/session/{session_id}")
-async def delete_session(
-    session_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Delete a single chat session"""
-    result = await db.execute(
-        select(ChatSession)
-        .where(
-            ChatSession.id == session_id,
-            ChatSession.user_id == current_user.id
-        )
-    )
-    session = result.scalar_one_or_none()
-    
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    await db.delete(session)
-    await db.commit()
-    
-    return {"message": "Session deleted"}
-
-@router.delete("/all")
-async def delete_all_sessions(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Delete all chat sessions for the current user"""
-    result = await db.execute(
-        select(ChatSession)
-        .where(ChatSession.user_id == current_user.id)
-    )
-    sessions = result.scalars().all()
-    
-    for session in sessions:
-        await db.delete(session)
-    
-    await db.commit()
-    
-    return {"message": f"Deleted {len(sessions)} sessions"}
-
-@router.get("/activity")
-async def get_activity_suggestion(category: str = "general"):
-    """Get activity suggestion with hyperlink"""
-    suggestions = {
-        "anxious": "Try this 5-minute guided breathing exercise: [Calm Breathing](https://www.calm.com/breathe)",
-        "sad": "Try this self-care checklist: [Mind Self-Care Guide](https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing)",
-        "stressed": "Here's a quick stress-busting workout: [7-Minute Workout](https://www.nytimes.com/2016/05/08/well/move/the-scientific-7-minute-workout.html)",
-        "lonely": "Connect with others: [Meetup Groups Near You](https://www.meetup.com)",
-        "general": "10-minute nature meditation: [Forest Bathing Guide](https://www.nhs.uk/mental-health/self-help/tips-and-support/nature-and-mental-health/)"
-    }
-    return {"activity": suggestions.get(category, suggestions["general"])}

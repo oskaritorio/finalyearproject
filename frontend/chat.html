@@ -131,6 +131,16 @@
                 NHS 111: 111<br>
                 SHOUT: Text 85258
             </div>
+            <div class="resources-section" style="margin-top: 12px; text-align: center;">
+                <p style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Helpful resources:</p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://www.samaritans.org" target="_blank" style="font-size: 12px; color: #9CAF88; text-decoration: none;">Samaritans</a>
+                    <a href="https://www.nhs.uk/mental-health" target="_blank" style="font-size: 12px; color: #9CAF88; text-decoration: none;">NHS Mental Health</a>
+                    <a href="https://www.mind.org.uk" target="_blank" style="font-size: 12px; color: #9CAF88; text-decoration: none;">Mind</a>
+                    <a href="https://www.giveusashout.org" target="_blank" style="font-size: 12px; color: #9CAF88; text-decoration: none;">SHOUT</a>
+                    <a href="https://www.calm.com" target="_blank" style="font-size: 12px; color: #9CAF88; text-decoration: none;">Calm</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -154,7 +164,7 @@
             const container = document.getElementById('chatMessages');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}`;
-            msgDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+            msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
             

@@ -1,6 +1,7 @@
 import re
 import random
 from typing import Tuple, List, Dict, Optional
+from sqlalchemy.ext.asyncio import AsyncSession
 
 class Chat:
     def __init__(self):
@@ -135,19 +136,10 @@ class Chat:
         # ANXIETY RESPONSES (12 variations)
         # ============================================
         self.anxious_responses = [
-            "Anxiety is exhausting. What's been on your mind lately?",
-            "I can hear that you're worried. Want to break it down together?",
-            "That feeling of being overwhelmed is really hard. What's one thing that's worrying you most?",
-            "I get that. When you feel anxious, what usually helps you feel a bit calmer?",
-            "That sounds stressful. Want to talk through what's worrying you?",
-            "Anxiety can feel like a storm inside. Let's take a slow breath together.",
-            "I can hear that your mind is racing. Would it help to focus on just one thing?",
-            "Worry has a way of making everything feel bigger. What would you say to a friend who felt this way?",
-            "That sounds really overwhelming. What's actually in your control right now?",
-            "Anxiety is so tiring. You've been carrying a lot. What's the smallest step that might help?",
-            "I can feel how much this is affecting you. What do you need right now to feel more grounded?",
-            "Your feelings are valid. Worry is trying to protect you, even when it's too loud."
-        ]
+    "😰 Anxiety can feel overwhelming. Try this <a href='https://www.calm.com/breathe' target='_blank' style='color: #9CAF88; text-decoration: underline;'>5-minute breathing exercise</a> or <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/wellbeing/' target='_blank' style='color: #9CAF88; text-decoration: underline;'>read wellbeing tips from Mind</a>.",
+    "I hear you're feeling worried. Here's a helpful <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank' style='color: #9CAF88; text-decoration: underline;'>NHS guide to stress</a>.",
+    "Anxiety is tough. Would you like to try a <a href='https://www.therapistaid.com/therapy-worksheet/anxiety-journal' target='_blank' style='color: #9CAF88; text-decoration: underline;'>guided journal exercise</a>?"
+]
         
         # ============================================
         # STORY RESPONSES (when user shares something specific, 8 variations)
@@ -163,33 +155,11 @@ class Chat:
             "I really appreciate you sharing that. What would support look like for you right now?"
         ]
 
-        self.activities = {
-            "anxious": [
-                "🧘 Try this 5-minute guided breathing exercise: [Calm Breathing](https://www.calm.com/breathe)",
-                "📝 Write down what's worrying you - here's a [guided journal template](https://www.therapistaid.com/therapy-worksheet/anxiety-journal)",
-                "🎵 Listen to calming music: [Lo-Fi Study Beats](https://www.youtube.com/watch?v=jfKfPfyJRdk)"
-            ],
-            "sad": [
-                "🌱 Try this self-care checklist: [Mind Self-Care Guide](https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing)",
-                "📖 Read something uplifting: [Short Stories for Difficult Times](https://www.shortstoryguide.com/uplifting-short-stories/)",
-                "🎬 Watch something comforting: [Movies That Make You Feel Good](https://www.imdb.com/list/ls000032679/)"
-            ],
-            "stressed": [
-                "💪 Here's a quick stress-busting workout: [7-Minute Workout](https://www.nytimes.com/2016/05/08/well/move/the-scientific-7-minute-workout.html)",
-                "🍵 Take a tea break. Here's a guide to [mindful drinking](https://www.mindful.org/how-to-practice-mindful-drinking/)",
-                "📵 Try a digital detox: [How to Take a Break from Screens](https://www.healthline.com/health/digital-detox)"
-            ],
-            "lonely": [
-                "🤝 Connect with others: [Meetup Groups Near You](https://www.meetup.com)",
-                "💬 Try a peer support community: [Side by Side - Mind](https://www.mind.org.uk/information-support/side-by-side)",
-                "🐾 Consider pet therapy: [How Pets Help Mental Health](https://www.nhs.uk/mental-health/self-help/tips-and-support/nature-and-mental-health/)"
-            ],
-            "general": [
-                "🌿 10-minute nature meditation: [Forest Bathing Guide](https://www.nhs.uk/mental-health/self-help/tips-and-support/nature-and-mental-health/)",
-                "📚 Read about wellbeing: [Mental Health Foundation Resources](https://www.mentalhealth.org.uk/explore-mental-health/publications)",
-                "🎯 Set a small goal today: [SMART Goal Template](https://www.mindtools.com/page6.html)"
-            ]
-        }
+        self.activity_responses = [
+    "🎯 Here's an activity that might help: <a href='https://www.nytimes.com/2016/05/08/well/move/the-scientific-7-minute-workout.html' target='_blank' style='color: #9CAF88; text-decoration: underline;'>7-minute workout</a>",
+    "🌿 Try this: <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank' style='color: #9CAF88; text-decoration: underline;'>NHS stress-busting techniques</a>",
+    "💚 Here's a helpful resource: <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/' target='_blank' style='color: #9CAF88; text-decoration: underline;'>Mind wellbeing tips</a>"
+]
         
         # ============================================
         # NAME RECOGNITION RESPONSES (6 variations)

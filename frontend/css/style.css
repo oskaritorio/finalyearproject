@@ -200,6 +200,27 @@ button, .save-btn, .btn-chat {
     box-shadow: 0 2px 8px rgba(156, 175, 136, 0.3);
 }
 
+/* Chat message links */
+.message-content a {
+    color: #9CAF88;
+    text-decoration: underline;
+}
+
+.message-content a:hover {
+    color: #8BAF78;
+    text-decoration: none;
+}
+
+/* Bot message links have darker text */
+.message.bot .message-content a {
+    color: #6B8F5E;
+}
+
+.message.user .message-content a {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+
 button:hover, .save-btn:hover, .btn-chat:hover {
     transform: scale(1.02);
     box-shadow: 0 6px 20px rgba(156, 175, 136, 0.4);
@@ -207,6 +228,17 @@ button:hover, .save-btn:hover, .btn-chat:hover {
 
 button:active {
     transform: scale(0.98);
+}
+
+/* Tips list links */
+.tips-list li a {
+    color: #9CAF88;
+    text-decoration: underline;
+}
+
+.tips-list li a:hover {
+    color: #8BAF78;
+    text-decoration: none;
 }
 
 /* ========================================

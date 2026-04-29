@@ -1,7 +1,3 @@
-// ========================================
-// WELLBEING RESULTS - IMPROVED DISPLAY
-// ========================================
-
 function displayResults() {
     const resultStr = localStorage.getItem('lastWellbeingResult');
     const container = document.getElementById('resultsContainer');
@@ -29,11 +25,11 @@ function displayResults() {
     };
     
     const categoryMessages = {
-        'Excellent': 'You\'re thriving! Keep up your great habits.',
-        'Good': 'You\'re doing well. Small improvements can make a difference.',
-        'Moderate': 'You\'re managing. Focus on small, positive steps.',
-        'Concerning': 'Your wellbeing matters. Consider reaching out for support.',
-        'Critical': 'Please reach out for support. You deserve help and care.'
+        'Excellent': "You're thriving! Keep up your great habits. 🌟",
+        'Good': "You're doing well. Small improvements can make a difference. 💚",
+        'Moderate': "You're managing. Focus on small, positive steps. 🌱",
+        'Concerning': "Your wellbeing matters. Consider reaching out for support. 🫂",
+        'Critical': "Please reach out for support. You deserve help and care. 💙"
     };
     
     const color = categoryColors[result.category] || '#9CAF88';
@@ -46,7 +42,7 @@ function displayResults() {
             <h2>🌿 Your Wellbeing Results</h2>
             <div class="score-circle" style="border: 4px solid ${color}">
                 <div class="score-number">${result.total_score}</div>
-                <div style="font-size: 14px;">/ 5.0</div>
+                <div>/ 5.0</div>
             </div>
             <div class="category-badge" style="background: ${color}; color: white;">${result.category}</div>
             <p style="margin-top: 16px; color: var(--text-light);">${message}</p>
@@ -56,7 +52,7 @@ function displayResults() {
         <h3 style="margin-top: 30px;">💡 Personalised Tips</h3>
         ${tips.length > 0 ? 
             `<ul class="tips-list">
-                ${tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('')}
+                ${tips.map(tip => `<li>${tip}</li>`).join('')}
             </ul>` : 
             `<p style="color: var(--text-light); text-align: center; padding: 20px;">Complete the assessment to receive personalised wellbeing tips.</p>`
         }
