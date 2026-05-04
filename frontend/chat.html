@@ -164,7 +164,8 @@
             const container = document.getElementById('chatMessages');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}`;
-            msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            const formattedText = text.replace(/\n/g, `<br>`);
+            msgDiv.innerHTML = `<div class="message-content">${formattedText}</div>`;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
             

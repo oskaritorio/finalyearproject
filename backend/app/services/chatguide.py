@@ -1,6 +1,8 @@
 import re
 import random
 from typing import Tuple, List, Dict, Optional
+from app.models.journal import JournalEntry
+from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 class Chat:
@@ -197,6 +199,18 @@ class Chat:
             "Sometimes doing something kind for yourself can help. Here's an idea: " + random.choice(self.self_care_activities),
             "Would you like me to suggest something that might help lift your mood?"
         ]
+
+        journal_summary_keywords = [
+            "what did i write", "show me my journal", "journal summary", 
+            "what have i been writing", "read my journal", "my entries",
+            "summarise my journal", "summarize my journal", "journal recap"
+        ]       
+
+        mood_analysis_keywords = [
+            "how is my mood", "mood trend", "am i getting better", 
+            "track my mood", "mood analysis", "how have i been feeling"
+        ]
+
         
         # ============================================
         # ANXIETY RESPONSES (with links to calming activities)
@@ -364,7 +378,7 @@ class Chat:
     # MAIN REPLY FUNCTION
     # ============================================
     
-    def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
+    async def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
         # ============================================
         # SAFETY FIRST - Crisis detection
         # ============================================
@@ -379,6 +393,28 @@ class Chat:
             )
         
         msg_lower = message.lower()
+        # ============================================
+        # JOURNAL COMMANDS - Chatbot reads journals
+        # ============================================
+
+        journal_summary_keywords = [
+            "what did i write", "show me my journal", "journal summary", 
+            "what have i been writing", "read my journal", "my entries",
+            "summarise my journal", "summarize my journal", "journal recap"
+        ]
+
+        mood_analysis_keywords = [
+            "how is my mood", "mood trend", "am i getting better", 
+            "track my mood", "mood analysis", "how have i been feeling"
+        ]
+
+        if any(phrase in msg_lower for phrase in journal_summary_keywords):
+            summary = await self.get_journal_summary(current_user.id, db)
+            return summary, "journal_summary", None
+
+        if any(phrase in msg_lower for phrase in mood_analysis_keywords):
+            analysis = await self.analyze_my_mood(current_user.id, db)
+            return analysis, "mood_analysis", None
         
         # ============================================
         # Extract and store name
@@ -471,6 +507,8 @@ class Chat:
             self.last_topic = "feeling anxious"
             return random.choice(self.anxious_responses), "anxiety", None
         
+        
+        
         # ============================================
         # DEFAULT - try to reference last topic if possible
         # ============================================
@@ -516,3 +554,114 @@ class Chat:
             return f"I noticed from your journal that you've been dealing with {', '.join(unique_topics)}. Would you like to talk about that?"
     
         return ""
+    
+    async def get_journal_summary(self, user_id: str, db, period: str = "recent") -> str:
+    
+    # Get recent entries
+        result = await db.execute(
+            select(JournalEntry)
+            .where(JournalEntry.user_id == user_id)
+            .order_by(desc(JournalEntry.created_at))
+            .limit(7)
+        )
+        entries = result.scalars().all()
+    
+        if not entries:
+            return "You haven't written any journal entries yet. Would you like to write one now?"
+    
+    # Count sentiments
+        sentiments = [e.sentiment_label for e in entries if e.sentiment_label]
+        sentiment_counts = Counter(sentiments) if sentiments else {}
+    
+    # Calculate average mood from entries (not just quick mood)
+        mood_scores = [e.mood_score for e in entries if e.mood_score]
+        avg_mood = sum(mood_scores) / len(mood_scores) if mood_scores else 3
+    
+    # Find common topics from key phrases
+        all_phrases = []
+        for e in entries:
+            if e.key_phrases:
+                all_phrases.extend(e.key_phrases.split(','))
+        top_phrases = Counter(all_phrases).most_common(3) if all_phrases else []
+    
+    # Build response
+        response = f"📊 **Journal Summary**\n\n"
+        response += f"You've written {len(entries)} entries recently.\n"
+        response += f"Average mood: {avg_mood:.1f}/5\n\n"
+    
+        if sentiment_counts:
+            response += f"**Sentiment breakdown:**\n"
+            for label, count in sentiment_counts.items():
+                emoji = "😊" if label == "positive" else "😔" if label == "negative" else "😐"
+                response += f"  {emoji} {label}: {count}\n"
+            response += "\n"
+    
+        if top_phrases:
+            response += f"**Common themes:** {', '.join([p[0] for p in top_phrases])}\n\n"
+    
+    # Latest entry preview
+        latest = entries[0]
+        preview = latest.encrypted_content[:100] + "..." if len(latest.encrypted_content) > 100 else latest.encrypted_content
+        response += f"📝 **Latest entry:**\n{preview}\n"
+    
+        return response
+
+    async def analyze_my_mood(self, user_id: str, db) -> str:
+    
+        result = await db.execute(
+            select(JournalEntry)
+            .where(JournalEntry.user_id == user_id)
+            .order_by(desc(JournalEntry.created_at))
+            .limit(14)
+        )
+        entries = result.scalars().all()
+    
+        if len(entries) < 3:
+            return "You don't have enough journal entries yet for me to analyse your mood trends. Try writing a few more entries!"
+    
+    # Calculate sentiment trend
+        sentiments = [e.sentiment_score for e in entries if e.sentiment_score is not None]
+        if len(sentiments) >= 3:
+            recent_avg = sum(sentiments[:3]) / 3
+            older_avg = sum(sentiments[-3:]) / 3
+        
+            if recent_avg > older_avg + 0.2:
+                trend = "improving 📈"
+                advice = "That's great! What do you think has contributed to this positive shift?"
+            elif recent_avg < older_avg - 0.2:
+                trend = "declining 📉"
+                advice = "I notice you've been feeling lower lately. Would you like to talk about what might be affecting your mood?"
+            else:
+                trend = "stable 📊"
+                advice = "Your mood has been consistent. Small daily habits can make a big difference over time."
+        else:
+            trend = "insufficient data"
+            advice = "Keep journaling so I can track your mood patterns!"
+    
+        response = f"📈 **Mood Trend Analysis**\n\n"
+        response += f"Based on your last {len(entries)} journal entries:\n"
+        response += f"Overall trend: {trend}\n\n"
+        response += advice
+    
+        return response
+
+    async def compare_mood_to_journal(self, user_id: str, db, quick_mood: int) -> str:
+    
+        result = await db.execute(
+            select(JournalEntry)
+            .where(JournalEntry.user_id == user_id)
+            .order_by(desc(JournalEntry.created_at))
+            .limit(1)
+        )
+        latest_journal = result.scalar_one_or_none()
+    
+        if not latest_journal:
+            return None
+    
+        journal_mood = latest_journal.mood_score
+        journal_sentiment = latest_journal.sentiment_label
+    
+        if abs(quick_mood - journal_mood) <= 1:
+            return f"Your quick mood ({quick_mood}/5) matches your recent journal entry! Consistency is great for tracking."
+        else:
+            return f"I notice a difference - your quick mood is {quick_mood}/5, but your recent journal entry suggested a {journal_sentiment} feeling ({journal_mood}/5). Would you like to explore why there might be a difference?"

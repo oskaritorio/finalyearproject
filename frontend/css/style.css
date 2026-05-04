@@ -376,29 +376,29 @@ button:active {
     line-height: 1.3;
 }
 
-/* Daily Quote Card - sits between welcome and quick links */
-.quote-api-card {
-    background: linear-gradient(135deg, #FDF8F0 0%, #FFF5E8 100%);
-    border-radius: 24px;
+/* Quote Static Box - No Bubble, Clean Border */
+.quote-static-box {
+    background: transparent;
+    border: 1px solid rgba(156, 175, 136, 0.3);
+    border-radius: 16px;
     padding: 20px 24px;
-    margin-bottom: 24px;
+    margin: 20px 0 30px 0;
     text-align: center;
-    border-left: 4px solid var(--accent-sage);
-    box-shadow: var(--shadow-soft);
     transition: all 0.3s ease;
 }
 
-.quote-api-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+.quote-static-box:hover {
+    border-color: var(--accent-sage);
+    background: rgba(156, 175, 136, 0.02);
 }
 
-.quote-icon {
-    font-size: 28px;
+.quote-static-box .quote-icon {
+    font-size: 24px;
     margin-bottom: 8px;
+    opacity: 0.6;
 }
 
-.quote-text {
+.quote-static-box .quote-text {
     font-size: 16px;
     font-style: italic;
     color: var(--text-soft);
@@ -406,9 +406,10 @@ button:active {
     margin-bottom: 8px;
 }
 
-.quote-author {
+.quote-static-box .quote-author {
     font-size: 12px;
     color: var(--text-light);
+    font-style: normal;
 }
 
 /* ========================================
