@@ -12,7 +12,7 @@ async def delete_account(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Permanently delete user account and all associated data"""
+  #delete the users account
     await db.delete(current_user)
     await db.commit()
     return {"message": "Account permanently deleted"}
@@ -21,8 +21,8 @@ async def delete_account(
 async def get_profile(
     current_user: User = Depends(get_current_user)
 ):
-    """Get current user profile"""
-    # Format the date for display
+
+    #Format the date for display
     created_date = None
     if current_user.created_at:
         created_date = current_user.created_at.isoformat()

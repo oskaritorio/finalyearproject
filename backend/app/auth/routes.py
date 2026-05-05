@@ -11,7 +11,7 @@ from app.auth.auth import hash_password
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
-# Simple request/response models
+#Simple request/response models
 class RegisterRequest(BaseModel):
     username: str
     password: str
@@ -31,14 +31,14 @@ async def register(
     db: AsyncSession = Depends(get_db)
 ):
     """Register a new user"""
-    # Check if username exists
+    #Check if username exists
     result = await db.execute(
         select(User).where(User.username == request.username)
     )
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Username already exists")
     
-    # Create user
+    #Create user
     user = User(
         id=str(uuid.uuid4()),
         username=request.username,
@@ -62,13 +62,13 @@ async def login(
     
     from app.auth.auth import verify_password
     
-    # Find user
+    #Find user
     result = await db.execute(
         select(User).where(User.username == request.username)
     )
     user = result.scalar_one_or_none()
     
-    # Check password
+    #Check password
     if not user or not verify_password(request.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     

@@ -28,8 +28,8 @@ async def create_mood(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Log today's mood"""
-    # Check if already logged today (optional)
+
+    #Check if already logged today 
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     
     existing = await db.execute(
@@ -58,7 +58,7 @@ async def create_mood(
         "note": mood_log.note,
         "created_at": mood_log.created_at
     }
-
+#retrieves the history of moods
 @router.get("/")
 async def get_mood_history(
     current_user: User = Depends(get_current_user),
@@ -80,7 +80,7 @@ async def get_mood_history(
     )
     moods = result.scalars().all()
     
-    # Calculate average
+    #Calculate average
     avg = sum(m.mood_score for m in moods) / len(moods) if moods else 0
     
     return {

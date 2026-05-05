@@ -13,7 +13,7 @@ class ChatSession(Base):
     started_at = Column(DateTime, default=datetime.utcnow)
     crisis_detected = Column(Boolean, default=False)
     
-    # Relationships
+    #Relationships
     user = relationship("User", back_populates="chat_sessions")
     messages = relationship("Message", back_populates="session", cascade="all, delete-orphan")
 
@@ -27,5 +27,5 @@ class Message(Base):
     content = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
     
-    # Relationships
+    #Relationships
     session = relationship("ChatSession", back_populates="messages")

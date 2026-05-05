@@ -28,7 +28,6 @@ class AssessmentResponse(BaseModel):
 
 @router.get("/questions")
 async def get_questions():
-    """Get all wellbeing questions"""
     return {
         "swemwbs": SWEMWBS_QUESTIONS,
         "phq2": PHQ2_QUESTIONS,
@@ -41,11 +40,11 @@ async def submit_assessment(
     request: AssessmentRequest,
     current_user: User = Depends(get_current_user)
 ):
-    """Submit a wellbeing assessment"""
-    
+
+    #submitting a wellbeing assessment
     responses = request.responses
     
-    # Validate all questions answered
+    #Validate all questions answered
     expected_ids = [q["id"] for q in ALL_QUESTIONS]
     for q_id in expected_ids:
         if q_id not in responses:
@@ -53,23 +52,23 @@ async def submit_assessment(
         if not 1 <= responses[q_id] <= 5:
             raise HTTPException(status_code=400, detail=f"Invalid score for {q_id}")
     
-    # Process responses (flip negative questions)
+    #Process responses 
     processed_responses = process_responses(responses)
     
-    # Calculate scores using PROCESSED (flipped) responses
+    #Calculate scores using PROCESSED (flipped) responses
     swemwbs_scores = [processed_responses[q["id"]] for q in SWEMWBS_QUESTIONS]
     phq2_scores = [processed_responses[q["id"]] for q in PHQ2_QUESTIONS]
     
     all_scores = swemwbs_scores + phq2_scores
     total_score = sum(all_scores) / len(all_scores)
     
-    # Calculate category
+    #Calculate category
     category, category_icon = calculate_category(total_score)
     
-    # Get personalised tips
+    #Get personalised tips
     tips = WellbeingService.get_tips_for_assessment(responses, total_score, category)
     
-    # Save to CSV
+    #Save to CSV
     success = WellbeingService.save_assessment(
         user_id=current_user.id,
         responses=responses,
@@ -95,7 +94,6 @@ async def submit_assessment(
 async def get_assessment_history(
     current_user: User = Depends(get_current_user)
 ):
-    """Get user's assessment history"""
     history = WellbeingService.get_user_history(current_user.id)
     return history
 
@@ -104,7 +102,6 @@ async def get_assessment_history(
 async def get_latest_assessment(
     current_user: User = Depends(get_current_user)
 ):
-    """Get user's most recent assessment"""
     latest = WellbeingService.get_latest_assessment(current_user.id)
     
     if not latest:
@@ -120,9 +117,7 @@ async def get_latest_assessment(
     }
 
 
-# ============================================
-# ✅ NEW: CHART DATA ENDPOINT
-# ============================================
+#chart data endpoint
 @router.get("/chart-data")
 async def get_chart_data(
     current_user: User = Depends(get_current_user)
@@ -152,7 +147,7 @@ async def get_chart_data(
         else:
             labels.append('Unknown')
         
-        # Get total score (already calculated)
+        #Get total score (already calculated)
         total_score = float(item.get('total_score', 0))
         scores.append(round(total_score, 2))
     

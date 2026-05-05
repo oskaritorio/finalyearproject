@@ -15,9 +15,9 @@ RESULTS_FILE = DATA_DIR / "wellbeing_results.csv"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# ============================================
+
 # QUESTION DEFINITIONS
-# ============================================
+
 
 SWEMWBS_QUESTIONS = [
     {"id": "q1_optimistic", "text": "I've been feeling optimistic about the future", "focus": "optimistic", "negative": False},
@@ -52,12 +52,12 @@ def calculate_category(score: float) -> Tuple[str, str]:
 
 
 def flip_negative_score(score: int) -> int:
-    """Flip score for negative questions: 1→5, 2→4, 3→3, 4→2, 5→1"""
+  
     return 6 - score
 
 
 def process_responses(responses: Dict) -> Dict:
-    """Process responses: flip negative questions"""
+
     processed = {}
     
     for q in ALL_QUESTIONS:
@@ -78,7 +78,6 @@ class WellbeingService:
     
     @staticmethod
     def load_tips() -> List[Dict]:
-        """Load tips from CSV file"""
         tips = []
         
         if not TIPS_FILE.exists():
@@ -104,7 +103,6 @@ class WellbeingService:
     
     @staticmethod
     def get_tips_for_assessment(responses: Dict, total_score: float, category: str) -> List[str]:
-        """Get personalised tips based on scores"""
         tips = WellbeingService.load_tips()
         selected_tips = []
         
@@ -147,7 +145,6 @@ class WellbeingService:
     
     @staticmethod
     def save_assessment(user_id: str, responses: Dict, total_score: float, category: str, tips: List[str]) -> bool:
-        """Save assessment results to CSV"""
         
         # Process responses to flip negative questions for storage
         processed = process_responses(responses)
@@ -186,7 +183,6 @@ class WellbeingService:
     
     @staticmethod
     def get_user_history(user_id: str) -> List[Dict]:
-        """Get all assessments for a user"""
         history = []
         
         if not RESULTS_FILE.exists():
@@ -209,6 +205,5 @@ class WellbeingService:
     
     @staticmethod
     def get_latest_assessment(user_id: str) -> Optional[Dict]:
-        """Get the most recent assessment for a user"""
         history = WellbeingService.get_user_history(user_id)
         return history[0] if history else None

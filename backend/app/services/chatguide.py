@@ -7,9 +7,9 @@ from sqlalchemy import select, desc
 
 class Chat:
     def __init__(self):
-        # ============================================
-        # SAFETY: Crisis keywords
-        # ============================================
+       
+        #SAFETY: Crisis keywords
+        
         self.crisis_words = [
             "kill myself", "end my life", "want to die", "suicide",
             "hurt myself", "self harm", "cut myself", "harm myself",
@@ -24,17 +24,17 @@ class Chat:
             "SHOUT: Text 85258 - <a href='https://www.giveusashout.org' target='_blank' style='color: #9CAF88; text-decoration: underline;'>Visit SHOUT Website</a>"
         ]
         
-        # ============================================
+       
         # MEMORY
-        # ============================================
+       
         self.user_name = None
         self.last_topic = None
         self.last_user_response = None
         self.conversation_topics = []
         
-        # ============================================
+       
         # ACTIVITIES FOR BOREDOM / FREE TIME
-        # ============================================
+        
         self.boredom_activities = [
             "Try reading a book: <a href='https://www.gutenberg.org/' target='_blank'>Free eBooks from Project Gutenberg</a>",
             "Learn something new: <a href='https://www.khanacademy.org/' target='_blank'>Khan Academy - Free Courses</a>",
@@ -465,9 +465,9 @@ class Chat:
     
         return response
 
-    # ============================================
+    
     # WELLBEING ASSESSMENT METHODS
-    # ============================================
+    
     
     
     async def get_wellbeing_summary(self, user_id: str, db) -> str:
@@ -606,14 +606,14 @@ class Chat:
         
         return response
 
-    # ============================================
+   
     # MAIN GET_REPLY METHOD - THIS IS WHAT YOUR CHAT.PY CALLS
-    # ============================================
+    
     
     async def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
-    # ============================================
+    
     # SAFETY FIRST - Crisis detection
-    # ============================================
+    
         if self.is_crisis(message):
             return (
                 "I'm really concerned about what you're sharing. Your safety is the most important thing.\n\n"
@@ -626,48 +626,48 @@ class Chat:
     
         msg_lower = message.lower()
     
-    # ============================================
+    
     # JOURNAL COMMANDS - CHECK SECOND
-    # ============================================
+    
         if any(phrase in msg_lower for phrase in self.journal_summary_keywords):
             return "📊 I can see your journal entries. Please ask this question from the main chat interface.", "journal_summary", None
     
         if any(phrase in msg_lower for phrase in self.mood_analysis_keywords):
             return "📈 I can analyse your mood trend. Please ask this question from the main chat interface.", "mood_analysis", None
     
-    # ============================================
+    
     # EXTRACT AND STORE NAME
-    # ============================================
+    
         name = self.extract_name(message)
         if name and not self.user_name:
             self.user_name = name
             return random.choice(self.name_responses).format(name=name), "name", None
     
-    # ============================================
+   
     # GREETINGS
-    # ============================================
+   
         greetings = ["hi", "hello", "hey", "hi there", "hello there", "good morning", "good afternoon", "good evening"]
         if any(msg_lower.startswith(greet) for greet in greetings):
             if self.user_name:
                 return f"Hey {self.user_name}. How are you doing today?", "greeting", None
             return random.choice(self.greeting_responses), "greeting", None
     
-    # ============================================
-    # "HOW ARE YOU?" - user asking bot
-    # ============================================
+    
+    # "HOW ARE YOU?"
+    
         if "how are you" in msg_lower or "how are you doing" in msg_lower:
             return random.choice(self.how_are_you_responses), "how_are_you", None
     
-    # ============================================
-    # "I'M GOOD" responses - dig deeper
-    # ============================================
+   
+    # "I'M GOOD" responses
+    
         good_phrases = ["i'm good", "im good", "i am good", "doing good", "doing well", "i'm okay", "im okay"]
         if any(phrase in msg_lower for phrase in good_phrases):
             return random.choice(self.good_responses), "good", None
     
-    # ============================================
-    # JOB/MONEY/STRESS SUPPORT (before emotion detection)
-    # ============================================
+   
+    #JOB/MONEY/STRESS SUPPORT 
+   
         if any(phrase in msg_lower for phrase in self.job_support_keywords):
             self.last_topic = "job support"
             return random.choice(self.job_support_sites), "job_support", None
@@ -680,9 +680,9 @@ class Chat:
             self.last_topic = "stress management"
             return random.choice(self.stress_management_tips), "stress_tips", None
     
-    # ============================================
-    # BOREDOM/KINDNESS/HAPPINESS DETECTION
-    # ============================================
+    
+    #BOREDOM/KINDNESS/HAPPINESS DETECTION
+    
         if any(word in msg_lower for word in self.boredom_keywords):
             self.last_topic = "activities to do"
             return self.get_activity_suggestions("boredom"), "boredom", None
@@ -695,31 +695,23 @@ class Chat:
             self.last_topic = "mood boosting activities"
             return self.get_activity_suggestions("happiness"), "happiness", None
     
-    # ============================================
-    # RESET LAST TOPIC WHEN ASKING NEW QUESTIONS
-    # ============================================
+  
     # If user asks a question, reset the last_topic to avoid being stuck
         if "?" in message or any(word in msg_lower for word in ["what", "how", "why", "when", "where", "who"]):
             self.last_topic = None
     
-    # ============================================
-    # USER REFERRING TO PREVIOUS CONVERSATION
-    # ============================================
+    
         if self.is_referring_to_previous(message) and self.last_topic:
             return random.choice(self.followup_responses).format(topic=self.last_topic), "followup", None
     
-    # ============================================
-    # USER TELLING A STORY
-    # ============================================
+   #users are allowed to tell stories
         if self.is_story(message):
             topics = self.extract_topics(message)
             if topics:
                 self.last_topic = topics[0]
             return random.choice(self.story_responses), "story", None
     
-    # ============================================
-    # EXTRACT TOPICS AND RESPOND
-    # ============================================
+  #topics and responses
         topics = self.extract_topics(message)
     
         if "jobs" in topics:
@@ -742,9 +734,7 @@ class Chat:
             self.last_topic = "feeling anxious"
             return random.choice(self.anxious_responses), "anxiety", None
     
-    # ============================================
-    # DEFAULT - try to reference last topic if possible
-    # ============================================
+    
         self.last_user_response = message
     
         if self.last_topic and len(message.split()) < 8:

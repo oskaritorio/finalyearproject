@@ -8,17 +8,17 @@ class JournalEntryBase(BaseModel):
     mood_score: int         # 1-5 scale
     tags: Optional[str] = None  # Optional: "work,family,health"
 
-# Schema for CREATING a new journal entry
+#Schema for CREATING a new journal entry
 class JournalEntryCreate(JournalEntryBase):
     pass
 
-# Schema for UPDATING an existing journal entry
+#Schema for UPDATING an existing journal entry
 class JournalEntryUpdate(BaseModel):
     encrypted_content: Optional[str] = None
     mood_score: Optional[int] = None
     tags: Optional[str] = None
 
-# Schema for RETURNING a journal entry (what the API sends back)
+#Schema for RETURNING a journal entry (what the API sends back)
 class JournalEntryResponse(JournalEntryBase):
     id: str                 # Database ID
     user_id: str            # Who owns this entry
@@ -26,11 +26,11 @@ class JournalEntryResponse(JournalEntryBase):
     created_at: datetime    # When it was written
     updated_at: datetime    # Last modified
     
-    # This tells Pydantic to work with SQLAlchemy models
+    #This tells Pydantic to work with SQLAlchemy models
     class Config:
         from_attributes = True
 
-# Schema for a list of journal entries
+#Schema for a list of journal entries
 class JournalEntryList(BaseModel):
     entries: List[JournalEntryResponse]
     total: int  # Total count (for pagination later)

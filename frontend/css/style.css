@@ -412,9 +412,7 @@ button:active {
     font-style: normal;
 }
 
-/* ========================================
-   MOOD SELECTOR - ANIMATED
-   ======================================== */
+
 .mood-selector {
     display: flex;
     gap: 20px;
@@ -459,9 +457,6 @@ button:active {
     transform: scale(1.15) rotate(5deg);
 }
 
-/* ========================================
-   CHAT BUBBLES
-   ======================================== */
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -499,9 +494,6 @@ button:active {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* ========================================
-   WARNING BANNER
-   ======================================== */
 .warning-banner {
     background: linear-gradient(135deg, #FDE2E2 0%, #FCE8E8 100%);
     color: var(--accent-terracotta);
@@ -525,9 +517,6 @@ button:active {
     animation: pulse 2s infinite;
 }
 
-/* ========================================
-   INPUTS & TEXTAREA
-   ======================================== */
 input, textarea {
     width: 100%;
     padding: 14px 18px;
@@ -550,9 +539,6 @@ textarea {
     resize: vertical;
 }
 
-/* ========================================
-   JOURNAL ENTRIES
-   ======================================== */
 .entry {
     border-bottom: 1px solid #F0E6D6;
     padding: 20px;
@@ -588,9 +574,6 @@ textarea {
     transform: scale(1.05);
 }
 
-/* ========================================
-   QUICK LINKS / ACTION CARDS
-   ======================================== */
 .quick-links {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -626,9 +609,7 @@ textarea {
     transform: scale(1.1);
 }
 
-/* ========================================
-   QUOTE BOX
-   ======================================== */
+
 .quote-box {
     background: linear-gradient(135deg, #FDF8F0 0%, #FFF5E8 100%);
     padding: 20px;
@@ -650,9 +631,7 @@ textarea {
     margin-top: 8px;
 }
 
-/* ========================================
-   TOAST NOTIFICATIONS
-   ======================================== */
+
 .toast {
     position: fixed;
     bottom: 30px;
@@ -667,7 +646,7 @@ textarea {
     box-shadow: var(--shadow-hover);
 }
 
-/* Floating animation for decorative elements */
+
 .floating {
     animation: float 6s ease-in-out infinite;
 }

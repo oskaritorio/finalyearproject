@@ -32,12 +32,11 @@ async def create_journal(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Create a journal entry with NLP sentiment analysis"""
     
-    # Analyse sentiment using TextBlob
+    #Analyse sentiment
     sentiment = SentimentAnalyzer.analyze(journal.content)
     
-    # Count words
+    #Count words
     word_count = len(journal.content.split())
     
     entry = JournalEntry(
@@ -71,8 +70,8 @@ async def get_journals(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get all journal entries for current user"""
-    
+
+    #get all the revelant journals for the user
     result = await db.execute(
         select(JournalEntry)
         .where(JournalEntry.user_id == current_user.id)
@@ -80,7 +79,7 @@ async def get_journals(
     )
     entries = result.scalars().all()
     
-    # Get aggregate sentiment stats
+    #Get aggregate sentiment stats
     sentiments = [e.sentiment_label for e in entries if e.sentiment_label]
     from collections import Counter
     sentiment_summary = Counter(sentiments).most_common(3) if sentiments else []
@@ -106,7 +105,7 @@ async def get_sentiment_summary(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get aggregate sentiment analysis of all journals"""
+   
     
     result = await db.execute(
         select(JournalEntry)
@@ -122,7 +121,7 @@ async def get_sentiment_summary(
     texts = [e.encrypted_content for e in entries if e.encrypted_content]
     batch_analysis = SentimentAnalyzer.analyze_batch(texts)
     
-    # Count by label
+    #Count by label
     from collections import Counter
     labels = [e.sentiment_label for e in entries if e.sentiment_label]
     label_counts = Counter(labels) if labels else {}
@@ -134,7 +133,7 @@ async def get_sentiment_summary(
         "breakdown": dict(label_counts),
         "trend": "improving" if batch_analysis["avg_polarity"] > 0.1 else "stable" if batch_analysis["avg_polarity"] > -0.1 else "declining"
     }
-
+#entry id fields to delete the journals
 @router.delete("/{entry_id}")
 async def delete_journal(
     entry_id: str,

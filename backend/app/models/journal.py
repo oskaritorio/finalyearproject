@@ -12,7 +12,7 @@ class JournalEntry(Base):
     encrypted_content = Column(Text, nullable=False)
     mood_score = Column(Integer, nullable=False)
     
-    # Simple sentiment analysis fields
+    #Simple sentiment analysis fields
     sentiment_score = Column(Float, nullable=True)
     sentiment_label = Column(String(20), nullable=True)
     

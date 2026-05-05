@@ -8,7 +8,6 @@ from collections import Counter
 from typing import Dict, List
 
 class SentimentAnalyzer:
-    """Simple sentiment analysis using keyword matching"""
     
     # Positive words
     positive_words = [
@@ -91,7 +90,6 @@ class SentimentAnalyzer:
     
     @staticmethod
     def analyze_batch(texts: List[str]) -> Dict:
-        """Analyse multiple texts and return aggregate stats"""
         results = [SentimentAnalyzer.analyze(t) for t in texts if t]
         
         if not results:
