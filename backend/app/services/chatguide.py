@@ -1,9 +1,9 @@
 import re
 import random
 from typing import Tuple, List, Dict, Optional
-from app.models.journal import JournalEntry
-from sqlalchemy import select, desc
+from collections import Counter
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, desc
 
 class Chat:
     def __init__(self):
@@ -31,7 +31,6 @@ class Chat:
         self.last_topic = None
         self.last_user_response = None
         self.conversation_topics = []
-        self.conversation_history = []
         
         # ============================================
         # ACTIVITIES FOR BOREDOM / FREE TIME
@@ -142,51 +141,48 @@ class Chat:
         ]
         
         # ============================================
-        # JOB RESPONSES
+        # JOB RESPONSES (with helpful links)
         # ============================================
         self.job_responses = [
-            "Looking for jobs can be really stressful. How's that process going for you?",
-            "Job hunting is tough. What kind of work are you looking for?",
-            "I hear you about job searching. Have you had any luck with applications?",
-            "Finding work takes time. What areas are you interested in?",
-            "Job hunting can feel endless. What's been the hardest part?",
-            "Are you looking for full-time or part-time work?",
-            "What kind of roles have you been applying for?",
-            "The job market is tough right now. How are you coping with it?",
-            "Have you had any interviews yet? How did they go?",
-            "What would your ideal job look like right now?"
+            "Looking for jobs can be really stressful. Here are some helpful resources:\n• <a href='https://www.indeed.co.uk' target='_blank'>Indeed - Job Search</a>\n• <a href='https://www.gov.uk/jobsearch' target='_blank'>Gov.uk Job Search</a>\n• <a href='https://www.totaljobs.com' target='_blank'>TotalJobs</a>\n\nWhat kind of work are you looking for?",
+            "Job hunting is tough. Try these sites:\n• <a href='https://www.linkedin.com/jobs/' target='_blank'>LinkedIn Jobs</a>\n• <a href='https://www.reed.co.uk' target='_blank'>Reed</a>\n• <a href='https://www.glassdoor.co.uk' target='_blank'>Glassdoor</a>\n\nWhat areas are you interested in?",
+            "I hear you about job searching. Here's how to write a good CV: <a href='https://www.careers.govt.nz/resources/cv-and-cover-letter-templates/' target='_blank'>CV Writing Guide</a>\n\nHave you had any luck with applications?",
+            "Finding work takes time. Try <a href='https://www.cv-library.co.uk' target='_blank'>CV-Library</a> or <a href='https://www.monster.co.uk' target='_blank'>Monster</a>\n\nWhat would your ideal job look like?",
+            "Job hunting can feel endless. The <a href='https://www.nationalcareers.service.gov.uk/job-profiles' target='_blank'>National Careers Service</a> has great advice.\n\nWhat's been the hardest part?",
+            "Are you looking for full-time or part-time work?\n\nHere's a guide to <a href='https://www.acas.org.uk/your-rights-and-responsibilities' target='_blank'>employment rights</a> you should know.",
+            "What kind of roles have you been applying for?\n\nNeed help with interviews? <a href='https://www.themuse.com/advice/interview-tips' target='_blank'>Interview Tips & Tricks</a>",
+            "The job market is tough right now. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/work/' target='_blank'>Mind's Work & Mental Health Guide</a> might help.\n\nHow are you coping with it?",
         ]
         
         # ============================================
-        # COURSEWORK RESPONSES
-        # ============================================
-        self.coursework_responses = [
-            "Coursework can be overwhelming. How are you managing it all?",
-            "Balancing coursework is tough. What's your heaviest subject right now?",
-            "I remember you mentioned coursework. How's that coming along?",
-            "Deadlines can be stressful. When are your next assignments due?",
-            "What subject are you finding most challenging right now?",
-            "Are you getting the support you need with your coursework?",
-            "How do you usually manage when coursework gets overwhelming?",
-            "Is there a particular assignment that's worrying you?"
-        ]
-        
-        # ============================================
-        # MONEY RESPONSES
+        # MONEY RESPONSES (with financial support links)
         # ============================================
         self.money_responses = [
-            "Money stress is really hard. Have you looked into any financial support options?",
-            "I hear you about needing money. What kind of work would you ideally want?",
-            "Financial pressure can feel overwhelming. What's been the toughest part?",
-            "Money worries affect everything. Are there any local resources you could tap into?",
-            "I understand money is tight. Have you thought about what kind of income would help most?",
-            "Financial stress is exhausting. What would make the biggest difference right now?",
-            "Have you looked into student support or hardship funds?",
-            "I hear you. Money problems can feel like they take over everything."
+            "Money stress is really hard. Here are some resources that might help:\n• <a href='https://www.citizensadvice.org.uk/debt-and-money/' target='_blank'>Citizens Advice - Money Help</a>\n• <a href='https://www.moneyhelper.org.uk/en' target='_blank'>Money Helper (Government)</a>\n• <a href='https://www.stepchange.org' target='_blank'>StepChange Debt Charity</a>\n\nHave you looked into any financial support options?",
+            "I hear you about needing money. <a href='https://www.entitledto.co.uk' target='_blank'>EntitledTo - Benefits Calculator</a> can show what you might be eligible for.\n\nWhat kind of work would you ideally want?",
+            "Financial pressure can feel overwhelming. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/money-and-mental-health/' target='_blank'>Mind's Money & Mental Health Guide</a>\n\nWhat's been the toughest part?",
+            "Money worries affect everything. <a href='https://www.turn2us.org.uk' target='_blank'>Turn2Us - Grants and Benefits Help</a>\n\nAre there any local resources you could tap into?",
+            "I understand money is tight. <a href='https://www.gov.uk/student-finance' target='_blank'>Student Finance England</a> or <a href='https://www.gov.uk/universal-credit' target='_blank'>Universal Credit</a> might be relevant.\n\nHave you thought about what kind of income would help most?",
+            "Financial stress is exhausting. <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/money-and-mental-health/' target='_blank'>NHS Guide to Money & Mental Health</a>\n\nWhat would make the biggest difference right now?",
+            "Have you looked into student support or hardship funds? Many universities offer <a href='https://www.gov.uk/student-finance' target='_blank'>hardship grants</a>.\n\nWould you like me to help you explore options?",
         ]
         
         # ============================================
-        # SADNESS RESPONSES (with links to happiness activities)
+        # COURSEWORK/EDUCATION RESPONSES
+        # ============================================
+        self.coursework_responses = [
+            "Coursework can be overwhelming. Here are some study resources:\n• <a href='https://www.bbc.co.uk/bitesize' target='_blank'>BBC Bitesize</a>\n• <a href='https://www.khanacademy.org' target='_blank'>Khan Academy</a>\n• <a href='https://www.quizlet.com' target='_blank'>Quizlet - Study Tools</a>\n\nHow are you managing it all?",
+            "Balancing coursework is tough. Try the <a href='https://todoist.com' target='_blank'>Todoist</a> app for organising deadlines.\n\nWhat's your heaviest subject right now?",
+            "I remember you mentioned coursework. <a href='https://www.grammarly.com' target='_blank'>Grammarly</a> can help with writing assignments.\n\nHow's that coming along?",
+            "Deadlines can be stressful. Try the <a href='https://pomofocus.io' target='_blank'>Pomodoro Timer</a> for focused study sessions.\n\nWhen are your next assignments due?",
+            "What subject are you finding most challenging?\n\n<a href='https://www.youtube.com/crashcourse' target='_blank'>Crash Course on YouTube</a> has great free tutorials.",
+            "Are you getting the support you need with your coursework?\n\nMost universities offer <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/student-life/' target='_blank'>student wellbeing services</a>.",
+            "How do you usually manage when coursework gets overwhelming?\n\nTry <a href='https://www.notion.so' target='_blank'>Notion</a> for organising notes and deadlines.",
+            "Is there a particular assignment that's worrying you?\n\n<a href='https://www.thestudyspace.com' target='_blank'>The Study Space</a> offers free study tips and motivation.",
+        ]
+        
+        # ============================================
+        # SADNESS RESPONSES
         # ============================================
         self.sad_responses = [
             "I'm sorry to hear that. Want to tell me what happened?",
@@ -199,21 +195,9 @@ class Chat:
             "Sometimes doing something kind for yourself can help. Here's an idea: " + random.choice(self.self_care_activities),
             "Would you like me to suggest something that might help lift your mood?"
         ]
-
-        journal_summary_keywords = [
-            "what did i write", "show me my journal", "journal summary", 
-            "what have i been writing", "read my journal", "my entries",
-            "summarise my journal", "summarize my journal", "journal recap"
-        ]       
-
-        mood_analysis_keywords = [
-            "how is my mood", "mood trend", "am i getting better", 
-            "track my mood", "mood analysis", "how have i been feeling"
-        ]
-
         
         # ============================================
-        # ANXIETY RESPONSES (with links to calming activities)
+        # ANXIETY RESPONSES
         # ============================================
         self.anxious_responses = [
             "Anxiety can feel overwhelming. Would you like to try a breathing exercise? <a href='https://www.calm.com/breathe' target='_blank'>Calm Breathing Exercise</a>",
@@ -291,14 +275,45 @@ class Chat:
         ]
 
         # ============================================
-        # KEYWORD DETECTION FOR ACTIVITIES
+        # JOB/MONEY SUPPORT SITES
+        # ============================================
+        self.job_support_sites = [
+            "Here are some job support websites:\n\n• <a href='https://www.indeed.co.uk' target='_blank'>Indeed</a> - Largest job board\n• <a href='https://www.linkedin.com/jobs/' target='_blank'>LinkedIn Jobs</a> - Network and apply\n• <a href='https://www.totaljobs.com' target='_blank'>TotalJobs</a>\n• <a href='https://www.reed.co.uk' target='_blank'>Reed</a>\n• <a href='https://www.gov.uk/jobsearch' target='_blank'>Gov.uk Job Search</a>\n\nWould you like help with CV writing or interview tips?",
+        ]
+
+        self.money_support_sites = [
+            "Here are some money support websites:\n\n• <a href='https://www.citizensadvice.org.uk/debt-and-money/' target='_blank'>Citizens Advice - Free Money Advice</a>\n• <a href='https://www.moneyhelper.org.uk/en' target='_blank'>Money Helper (Government)</a>\n• <a href='https://www.stepchange.org' target='_blank'>StepChange - Free Debt Advice</a>\n• <a href='https://www.entitledto.co.uk' target='_blank'>EntitledTo - Benefits Calculator</a>\n• <a href='https://www.turn2us.org.uk' target='_blank'>Turn2Us - Grants Search</a>\n\nWould you like me to help you explore any of these options?",
+        ]
+
+        self.stress_management_tips = [
+            "Here are some stress management techniques:\n\n• <a href='https://www.calm.com/breathe' target='_blank'>5-Minute Breathing Exercise</a>\n• <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank'>NHS Stress-Busting Guide</a>\n• <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/stress/' target='_blank'>Mind's Stress Guide</a>\n• Try the 5-4-3-2-1 grounding technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste",
+        ]
+
+        # ============================================
+        # KEYWORD DETECTION LISTS
         # ============================================
         self.boredom_keywords = ["bored", "nothing to do", "free time", "what to do", "any ideas", "suggest something"]
         self.kindness_keywords = ["kind", "kindness", "nice thing", "good deed", "help someone"]
         self.happiness_keywords = ["happier", "feel better", "cheer up", "boost mood", "feel good", "happy"]
-    
+        
+        self.journal_summary_keywords = [
+            "what did i write", "show me my journal", "journal summary", 
+            "what have i been writing", "read my journal", "my entries",
+            "summarise my journal", "summarize my journal", "journal recap"
+        ]
+
+        self.mood_analysis_keywords = [
+            "how is my mood", "mood trend", "am i getting better", 
+            "track my mood", "mood analysis", "how have i been feeling"
+        ]
+
+
+        self.job_support_keywords = ["job support", "job sites", "job websites", "find a job", "job search"]
+        self.money_support_keywords = ["money support", "financial help", "money help", "benefits", "financial support"]
+        self.stress_keywords = ["stress tips", "manage stress", "stress management", "calm down"]
+
     # ============================================
-    # Helper Methods
+    # HELPER METHODS
     # ============================================
     
     def extract_topics(self, message: str) -> List[str]:
@@ -310,10 +325,7 @@ class Chat:
             "money": ["money", "bills", "rent", "expensive", "cost", "paid", "financial"],
             "coursework": ["coursework", "assignment", "deadline", "exam", "study", "class", "uni"],
             "sad": ["sad", "down", "depressed", "unhappy", "low", "miserable", "lonely", "heartbroken"],
-            "anxious": ["anxious", "nervous", "worried", "stressed", "overwhelmed", "panic", "scared", "fear"],
-            "bored": self.boredom_keywords,
-            "kindness": self.kindness_keywords,
-            "happiness": self.happiness_keywords
+            "anxious": ["anxious", "nervous", "worried", "stressed", "overwhelmed", "panic", "scared", "fear"]
         }
         
         for topic, keywords in topic_keywords.items():
@@ -375,189 +387,12 @@ class Chat:
         return None
 
     # ============================================
-    # MAIN REPLY FUNCTION
+    # JOURNAL METHODS
     # ============================================
     
-    async def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
-        # ============================================
-        # SAFETY FIRST - Crisis detection
-        # ============================================
-        if self.is_crisis(message):
-            return (
-                "I'm really concerned about what you're sharing. Your safety is the most important thing.\n "
-                "\n\nPlease reach out to someone who can help right away:\n\n" + 
-                "\n".join(self.help_lines) +
-                "\n\nYou don't have to go through this alone. Please reach out.",
-                "CRISIS",
-                self.help_lines
-            )
-        
-        msg_lower = message.lower()
-        # ============================================
-        # JOURNAL COMMANDS - Chatbot reads journals
-        # ============================================
-
-        journal_summary_keywords = [
-            "what did i write", "show me my journal", "journal summary", 
-            "what have i been writing", "read my journal", "my entries",
-            "summarise my journal", "summarize my journal", "journal recap"
-        ]
-
-        mood_analysis_keywords = [
-            "how is my mood", "mood trend", "am i getting better", 
-            "track my mood", "mood analysis", "how have i been feeling"
-        ]
-
-        if any(phrase in msg_lower for phrase in journal_summary_keywords):
-            summary = await self.get_journal_summary(current_user.id, db)
-            return summary, "journal_summary", None
-
-        if any(phrase in msg_lower for phrase in mood_analysis_keywords):
-            analysis = await self.analyze_my_mood(current_user.id, db)
-            return analysis, "mood_analysis", None
-        
-        # ============================================
-        # Extract and store name
-        # ============================================
-        name = self.extract_name(message)
-        if name and not self.user_name:
-            self.user_name = name
-            return random.choice(self.name_responses).format(name=name), "name", None
-        
-        # ============================================
-        # GREETINGS
-        # ============================================
-        greetings = ["hi", "hello", "hey", "hi there", "hello there", "good morning", "good afternoon", "good evening"]
-        if any(msg_lower.startswith(greet) for greet in greetings):
-            if self.user_name:
-                return f"Hey {self.user_name}. How are you doing today?", "greeting", None
-            return random.choice(self.greeting_responses), "greeting", None
-        
-        # ============================================
-        # "HOW ARE YOU?" - user asking bot
-        # ============================================
-        if "how are you" in msg_lower or "how are you doing" in msg_lower:
-            return random.choice(self.how_are_you_responses), "how_are_you", None
-        
-        # ============================================
-        # "I'M GOOD" responses - dig deeper
-        # ============================================
-        good_phrases = ["i'm good", "im good", "i am good", "doing good", "doing well", "i'm okay", "im okay"]
-        if any(phrase in msg_lower for phrase in good_phrases):
-            return random.choice(self.good_responses), "good", None
-        
-        # ============================================
-        # BOREDOM DETECTION
-        # ============================================
-        if any(word in msg_lower for word in self.boredom_keywords):
-            self.last_topic = "activities to do"
-            return self.get_activity_suggestions("boredom"), "boredom", None
-        
-        # ============================================
-        # KINDNESS DETECTION
-        # ============================================
-        if any(word in msg_lower for word in self.kindness_keywords):
-            self.last_topic = "acts of kindness"
-            return self.get_activity_suggestions("kindness"), "kindness", None
-        
-        # ============================================
-        # HAPPINESS/MOOD BOOST DETECTION
-        # ============================================
-        if any(word in msg_lower for word in self.happiness_keywords):
-            self.last_topic = "mood boosting activities"
-            return self.get_activity_suggestions("happiness"), "happiness", None
-        
-        # ============================================
-        # USER REFERRING TO PREVIOUS CONVERSATION
-        # ============================================
-        if self.is_referring_to_previous(message) and self.last_topic:
-            return random.choice(self.followup_responses).format(topic=self.last_topic), "followup", None
-        
-        # ============================================
-        # USER TELLING A STORY
-        # ============================================
-        if self.is_story(message):
-            topics = self.extract_topics(message)
-            if topics:
-                self.last_topic = topics[0]
-            return random.choice(self.story_responses), "story", None
-        
-        # ============================================
-        # EXTRACT TOPICS AND RESPOND
-        # ============================================
-        topics = self.extract_topics(message)
-        
-        if "jobs" in topics:
-            self.last_topic = "looking for jobs"
-            return random.choice(self.job_responses), "jobs", None
-        
-        if "coursework" in topics:
-            self.last_topic = "your coursework"
-            return random.choice(self.coursework_responses), "coursework", None
-        
-        if "money" in topics:
-            self.last_topic = "needing money"
-            return random.choice(self.money_responses), "money", None
-        
-        if "sad" in topics:
-            self.last_topic = "feeling sad"
-            return random.choice(self.sad_responses), "sadness", None
-        
-        if "anxious" in topics:
-            self.last_topic = "feeling anxious"
-            return random.choice(self.anxious_responses), "anxiety", None
-        
-        
-        
-        # ============================================
-        # DEFAULT - try to reference last topic if possible
-        # ============================================
-        self.last_user_response = message
-        
-        if self.last_topic and len(message.split()) < 8:
-            return random.choice(self.followup_responses).format(topic=self.last_topic), "followup", None
-        
-        return random.choice(self.default_responses), "default", None
-    
-    async def get_journal_context(self, user_id: str, db: AsyncSession) -> str:
-        """Get recent journal entries to provide context for chatbot"""
+    async def get_journal_summary(self, user_id: str, db) -> str:
         from app.models.journal import JournalEntry
-        from sqlalchemy import select, desc
-    
-        result = await db.execute(
-            select(JournalEntry)
-            .where(JournalEntry.user_id == user_id)
-            .order_by(desc(JournalEntry.created_at))
-            .limit(3)
-        )
-        entries = result.scalars().all()
-    
-        if not entries:
-            return ""
-    
-        topics = []
-        for entry in entries:
-            content = entry.encrypted_content.lower()
-            if "stress" in content or "anxious" in content:
-                topics.append("stress and anxiety")
-            if "work" in content or "job" in content:
-                topics.append("work")
-            if "exam" in content or "study" in content:
-                topics.append("exams")
-            if "friend" in content or "family" in content:
-                topics.append("relationships")
-            if "bored" in content:
-                topics.append("feeling bored")
-    
-        if topics:
-            unique_topics = list(set(topics))
-            return f"I noticed from your journal that you've been dealing with {', '.join(unique_topics)}. Would you like to talk about that?"
-    
-        return ""
-    
-    async def get_journal_summary(self, user_id: str, db, period: str = "recent") -> str:
-    
-    # Get recent entries
+        
         result = await db.execute(
             select(JournalEntry)
             .where(JournalEntry.user_id == user_id)
@@ -569,45 +404,31 @@ class Chat:
         if not entries:
             return "You haven't written any journal entries yet. Would you like to write one now?"
     
-    # Count sentiments
         sentiments = [e.sentiment_label for e in entries if e.sentiment_label]
         sentiment_counts = Counter(sentiments) if sentiments else {}
-    
-    # Calculate average mood from entries (not just quick mood)
         mood_scores = [e.mood_score for e in entries if e.mood_score]
         avg_mood = sum(mood_scores) / len(mood_scores) if mood_scores else 3
     
-    # Find common topics from key phrases
-        all_phrases = []
-        for e in entries:
-            if e.key_phrases:
-                all_phrases.extend(e.key_phrases.split(','))
-        top_phrases = Counter(all_phrases).most_common(3) if all_phrases else []
-    
-    # Build response
-        response = f"📊 **Journal Summary**\n\n"
+        response = f"📊 Journal Summary\n\n"
         response += f"You've written {len(entries)} entries recently.\n"
         response += f"Average mood: {avg_mood:.1f}/5\n\n"
     
         if sentiment_counts:
-            response += f"**Sentiment breakdown:**\n"
+            response += f"Sentiment breakdown:\n"
             for label, count in sentiment_counts.items():
                 emoji = "😊" if label == "positive" else "😔" if label == "negative" else "😐"
                 response += f"  {emoji} {label}: {count}\n"
             response += "\n"
     
-        if top_phrases:
-            response += f"**Common themes:** {', '.join([p[0] for p in top_phrases])}\n\n"
-    
-    # Latest entry preview
         latest = entries[0]
         preview = latest.encrypted_content[:100] + "..." if len(latest.encrypted_content) > 100 else latest.encrypted_content
-        response += f"📝 **Latest entry:**\n{preview}\n"
+        response += f"Latest entry:\n{preview}\n"
     
         return response
 
     async def analyze_my_mood(self, user_id: str, db) -> str:
-    
+        from app.models.journal import JournalEntry
+        
         result = await db.execute(
             select(JournalEntry)
             .where(JournalEntry.user_id == user_id)
@@ -619,7 +440,6 @@ class Chat:
         if len(entries) < 3:
             return "You don't have enough journal entries yet for me to analyse your mood trends. Try writing a few more entries!"
     
-    # Calculate sentiment trend
         sentiments = [e.sentiment_score for e in entries if e.sentiment_score is not None]
         if len(sentiments) >= 3:
             recent_avg = sum(sentiments[:3]) / 3
@@ -638,30 +458,296 @@ class Chat:
             trend = "insufficient data"
             advice = "Keep journaling so I can track your mood patterns!"
     
-        response = f"📈 **Mood Trend Analysis**\n\n"
+        response = f"📈 Mood Trend Analysis\n\n"
         response += f"Based on your last {len(entries)} journal entries:\n"
         response += f"Overall trend: {trend}\n\n"
         response += advice
     
         return response
 
-    async def compare_mood_to_journal(self, user_id: str, db, quick_mood: int) -> str:
+    # ============================================
+    # WELLBEING ASSESSMENT METHODS
+    # ============================================
     
-        result = await db.execute(
-            select(JournalEntry)
-            .where(JournalEntry.user_id == user_id)
-            .order_by(desc(JournalEntry.created_at))
-            .limit(1)
-        )
-        latest_journal = result.scalar_one_or_none()
     
-        if not latest_journal:
-            return None
-    
-        journal_mood = latest_journal.mood_score
-        journal_sentiment = latest_journal.sentiment_label
-    
-        if abs(quick_mood - journal_mood) <= 1:
-            return f"Your quick mood ({quick_mood}/5) matches your recent journal entry! Consistency is great for tracking."
+    async def get_wellbeing_summary(self, user_id: str, db) -> str:
+        from app.services.wellbeing_service import WellbeingService
+        
+        latest = WellbeingService.get_latest_assessment(user_id)
+        
+        if not latest:
+            return "You haven't completed a wellbeing assessment yet. Would you like to take one? You can find it in the Mood & Wellbeing section."
+        
+        category = latest.get('category', 'Unknown')
+        total_score = latest.get('total_score', 0)
+        date = latest.get('date', '')[:10]
+        
+        category_advice = {
+            "Excellent": "You're thriving! Here are some resources to maintain your wellbeing:\n• <a href='https://www.nhs.uk/every-mind-matters/' target='_blank'>Every Mind Matters</a>\n• <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/' target='_blank'>Mind Wellbeing Tips</a>",
+            "Good": "You're doing well! Here are some resources to keep you on track:\n• <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/' target='_blank'>NHS Self-Help Guides</a>\n• <a href='https://www.mentalhealth.org.uk/explore-mental-health/publications' target='_blank'>Mental Health Foundation</a>",
+            "Moderate": "You're managing. Here are some resources that might help:\n• <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/tips-for-low-mood/' target='_blank'>NHS Tips for Low Mood</a>\n• <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/wellbeing/wellbeing/' target='_blank'>Mind Wellbeing Guide</a>",
+            "Concerning": "Your wellbeing matters. Here are some resources that can help:\n• <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Mind Crisis Services</a>\n• <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>NHS Mental Health Services</a>\n• <a href='https://www.samaritans.org/' target='_blank'>Samaritans - 116 123</a>",
+            "Critical": "Please reach out for support. You deserve help:\n• <a href='https://www.samaritans.org/' target='_blank'>Samaritans - 116 123 (24/7)</a>\n• <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>NHS Mental Health Services</a>"
+        }
+        
+        advice = category_advice.get(category, "Here are some general wellbeing resources:\n• <a href='https://www.nhs.uk/every-mind-matters/' target='_blank'>Every Mind Matters</a>\n• <a href='https://www.mind.org.uk/' target='_blank'>Mind</a>")
+        
+        response = f"📊 Your Latest Wellbeing Assessment\n\n"
+        response += f"Date: {date}\n"
+        response += f"Score: {total_score}/5\n"
+        response += f"Category: {category}\n\n"
+        response += f"Personalised Advice:\n{advice}\n\n"
+        response += f"Would you like to take another assessment or talk about how you've been feeling?"
+        
+        return response
+
+    async def analyze_wellbeing_trend(self, user_id: str, db) -> str:
+        from app.services.wellbeing_service import WellbeingService
+        
+        history = WellbeingService.get_user_history(user_id)
+        
+        if not history:
+            return "You haven't completed any wellbeing assessments yet. Take one in the Mood & Wellbeing section to start tracking your progress!"
+        
+        if len(history) < 2:
+            return f"You've completed {len(history)} assessment. Take another one to see your progress over time!"
+        
+        scores = []
+        dates = []
+        for item in history[:5]:
+            scores.append(float(item.get('total_score', 0)))
+            dates.append(item.get('date', '')[:10])
+        
+        if len(scores) >= 2:
+            first = scores[-1]
+            last = scores[0]
+            difference = last - first
+            
+            if difference > 0.5:
+                trend = "improving significantly 📈"
+                advice = "That's fantastic progress! What do you think has helped you feel better?"
+            elif difference > 0.2:
+                trend = "improving 📈"
+                advice = "Good progress! Keep up the positive habits you've been building."
+            elif difference < -0.5:
+                trend = "declining significantly 📉"
+                advice = "I notice your scores have been lower. Would you like to talk about what might be affecting your wellbeing?"
+            elif difference < -0.2:
+                trend = "declining 📉"
+                advice = "Your scores have trended downward. Here's a <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/tips-for-low-mood/' target='_blank'>NHS guide for low mood</a> that might help."
+            else:
+                trend = "stable 📊"
+                advice = "Your wellbeing has been consistent. Small daily habits can make a big difference over time."
         else:
-            return f"I notice a difference - your quick mood is {quick_mood}/5, but your recent journal entry suggested a {journal_sentiment} feeling ({journal_mood}/5). Would you like to explore why there might be a difference?"
+            trend = "insufficient data"
+            advice = "Complete more assessments to see your wellbeing trend!"
+        
+        response = f"📈 Wellbeing Trend Analysis\n\n"
+        response += f"Based on your last {len(history)} assessments:\n"
+        
+        for i, (score, date) in enumerate(zip(scores[:3], dates[:3])):
+            response += f"  {date}: {score}/5\n"
+        
+        response += f"\n📊 Overall trend: {trend}\n\n"
+        response += f"{advice}\n\n"
+        response += f"Would you like to take a new assessment or talk about specific concerns?"
+        
+        return response
+
+    async def get_wellbeing_tips(self, user_id: str, db, topic: str = None) -> str:
+        from app.services.wellbeing_service import WellbeingService
+        
+        latest = WellbeingService.get_latest_assessment(user_id)
+        
+        if not latest:
+            return "Take a wellbeing assessment first to get personalised tips! You can find it in the Mood & Wellbeing section."
+        
+        category = latest.get('category', 'Moderate')
+        
+        tips_by_category = {
+            "Excellent": [
+                "🌟 Keep up your great habits! Consider sharing what works with others.",
+                "📝 Try a gratitude journal - write 3 good things each day.",
+                "🧘 Maintain your wellbeing with <a href='https://www.nhs.uk/every-mind-matters/' target='_blank'>Every Mind Matters</a>",
+                "💪 Challenge yourself to learn something new or help someone this week."
+            ],
+            "Good": [
+                "🌱 Small improvements can make a big difference. Try adding one new positive habit.",
+                "📖 Read <a href='https://www.shortstoryguide.com/uplifting-short-stories/' target='_blank'>uplifting short stories</a> to boost your mood.",
+                "🧘 Try <a href='https://www.calm.com/breathe' target='_blank'>5-minute breathing exercises</a> daily.",
+                "💚 Connect with others - <a href='https://www.meetup.com' target='_blank'>find local groups on Meetup</a>"
+            ],
+            "Moderate": [
+                "🌿 Focus on small steps. Here's a <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/tips-for-low-mood/' target='_blank'>NHS guide for low mood</a>",
+                "🚶 Take a 10-minute walk each day - it's proven to boost mood.",
+                "📝 Try journaling your thoughts using the journal feature.",
+                "💬 Talk to someone you trust. <a href='https://www.samaritans.org/' target='_blank'>Samaritans</a> are available 24/7 if you need support."
+            ],
+            "Concerning": [
+                "🫂 Your wellbeing matters. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Mind Crisis Services</a> can help.",
+                "📞 Reach out to <a href='https://www.samaritans.org/' target='_blank'>Samaritans</a> at 116 123 for confidential support.",
+                "🧘 Try this <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank'>NHS stress-busting guide</a>",
+                "💙 Remember: you're not alone. Many people care about your wellbeing."
+            ],
+            "Critical": [
+                "🆘 Please reach out immediately: <a href='https://www.samaritans.org/' target='_blank'>Samaritans 116 123</a>",
+                "🏥 Contact your GP or <a href='https://www.nhs.uk/mental-health/nhs-voluntary-charity-services/' target='_blank'>NHS Mental Health Services</a>",
+                "💙 You deserve support. <a href='https://www.mind.org.uk/information-support/guides-to-support-and-services/crisis-services/' target='_blank'>Mind Crisis Support</a>"
+            ]
+        }
+        
+        tips = tips_by_category.get(category, tips_by_category["Moderate"])
+        selected_tips = random.sample(tips, min(2, len(tips)))
+        
+        response = f"💡 Personalised Wellbeing Tips (Based on your {category} category)\n\n"
+        for tip in selected_tips:
+            response += f"• {tip}\n"
+        response += f"\nWould you like to take a new assessment to update your results?"
+        
+        return response
+
+    # ============================================
+    # MAIN GET_REPLY METHOD - THIS IS WHAT YOUR CHAT.PY CALLS
+    # ============================================
+    
+    async def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
+    # ============================================
+    # SAFETY FIRST - Crisis detection
+    # ============================================
+        if self.is_crisis(message):
+            return (
+                "I'm really concerned about what you're sharing. Your safety is the most important thing.\n\n"
+                "Please reach out to someone who can help right away:\n\n" + 
+                "\n".join(self.help_lines) +
+                "\n\nYou don't have to go through this alone. Please reach out.",
+                "CRISIS",
+                self.help_lines
+            )
+    
+        msg_lower = message.lower()
+    
+    # ============================================
+    # JOURNAL COMMANDS - CHECK SECOND
+    # ============================================
+        if any(phrase in msg_lower for phrase in self.journal_summary_keywords):
+            return "📊 I can see your journal entries. Please ask this question from the main chat interface.", "journal_summary", None
+    
+        if any(phrase in msg_lower for phrase in self.mood_analysis_keywords):
+            return "📈 I can analyse your mood trend. Please ask this question from the main chat interface.", "mood_analysis", None
+    
+    # ============================================
+    # EXTRACT AND STORE NAME
+    # ============================================
+        name = self.extract_name(message)
+        if name and not self.user_name:
+            self.user_name = name
+            return random.choice(self.name_responses).format(name=name), "name", None
+    
+    # ============================================
+    # GREETINGS
+    # ============================================
+        greetings = ["hi", "hello", "hey", "hi there", "hello there", "good morning", "good afternoon", "good evening"]
+        if any(msg_lower.startswith(greet) for greet in greetings):
+            if self.user_name:
+                return f"Hey {self.user_name}. How are you doing today?", "greeting", None
+            return random.choice(self.greeting_responses), "greeting", None
+    
+    # ============================================
+    # "HOW ARE YOU?" - user asking bot
+    # ============================================
+        if "how are you" in msg_lower or "how are you doing" in msg_lower:
+            return random.choice(self.how_are_you_responses), "how_are_you", None
+    
+    # ============================================
+    # "I'M GOOD" responses - dig deeper
+    # ============================================
+        good_phrases = ["i'm good", "im good", "i am good", "doing good", "doing well", "i'm okay", "im okay"]
+        if any(phrase in msg_lower for phrase in good_phrases):
+            return random.choice(self.good_responses), "good", None
+    
+    # ============================================
+    # JOB/MONEY/STRESS SUPPORT (before emotion detection)
+    # ============================================
+        if any(phrase in msg_lower for phrase in self.job_support_keywords):
+            self.last_topic = "job support"
+            return random.choice(self.job_support_sites), "job_support", None
+    
+        if any(phrase in msg_lower for phrase in self.money_support_keywords):
+            self.last_topic = "money support"
+            return random.choice(self.money_support_sites), "money_support", None
+    
+        if any(phrase in msg_lower for phrase in self.stress_keywords):
+            self.last_topic = "stress management"
+            return random.choice(self.stress_management_tips), "stress_tips", None
+    
+    # ============================================
+    # BOREDOM/KINDNESS/HAPPINESS DETECTION
+    # ============================================
+        if any(word in msg_lower for word in self.boredom_keywords):
+            self.last_topic = "activities to do"
+            return self.get_activity_suggestions("boredom"), "boredom", None
+    
+        if any(word in msg_lower for word in self.kindness_keywords):
+            self.last_topic = "acts of kindness"
+            return self.get_activity_suggestions("kindness"), "kindness", None
+    
+        if any(word in msg_lower for word in self.happiness_keywords):
+            self.last_topic = "mood boosting activities"
+            return self.get_activity_suggestions("happiness"), "happiness", None
+    
+    # ============================================
+    # RESET LAST TOPIC WHEN ASKING NEW QUESTIONS
+    # ============================================
+    # If user asks a question, reset the last_topic to avoid being stuck
+        if "?" in message or any(word in msg_lower for word in ["what", "how", "why", "when", "where", "who"]):
+            self.last_topic = None
+    
+    # ============================================
+    # USER REFERRING TO PREVIOUS CONVERSATION
+    # ============================================
+        if self.is_referring_to_previous(message) and self.last_topic:
+            return random.choice(self.followup_responses).format(topic=self.last_topic), "followup", None
+    
+    # ============================================
+    # USER TELLING A STORY
+    # ============================================
+        if self.is_story(message):
+            topics = self.extract_topics(message)
+            if topics:
+                self.last_topic = topics[0]
+            return random.choice(self.story_responses), "story", None
+    
+    # ============================================
+    # EXTRACT TOPICS AND RESPOND
+    # ============================================
+        topics = self.extract_topics(message)
+    
+        if "jobs" in topics:
+            self.last_topic = "looking for jobs"
+            return random.choice(self.job_responses), "jobs", None
+    
+        if "coursework" in topics:
+            self.last_topic = "your coursework"
+            return random.choice(self.coursework_responses), "coursework", None
+    
+        if "money" in topics:
+            self.last_topic = "needing money"
+            return random.choice(self.money_responses), "money", None
+    
+        if "sad" in topics:
+            self.last_topic = "feeling sad"
+            return random.choice(self.sad_responses), "sadness", None
+    
+        if "anxious" in topics:
+            self.last_topic = "feeling anxious"
+            return random.choice(self.anxious_responses), "anxiety", None
+    
+    # ============================================
+    # DEFAULT - try to reference last topic if possible
+    # ============================================
+        self.last_user_response = message
+    
+        if self.last_topic and len(message.split()) < 8:
+            return random.choice(self.followup_responses).format(topic=self.last_topic), "followup", None
+    
+        return random.choice(self.default_responses), "default", None

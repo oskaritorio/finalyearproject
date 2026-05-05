@@ -4,6 +4,7 @@ from datetime import datetime
 import uuid
 from .base import Base
 
+
 class ChatSession(Base):
     __tablename__ = "chat_sessions"
     
