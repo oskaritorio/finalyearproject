@@ -1,6 +1,4 @@
-"""
-Wellbeing Service - Handles CSV loading and saving for wellbeing assessments
-"""
+
 import csv
 import os
 import uuid
