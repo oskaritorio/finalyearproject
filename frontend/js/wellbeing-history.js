@@ -1,7 +1,3 @@
-// ========================================
-// WELLBEING HISTORY
-// Shows all past assessments
-// ========================================
 
 function getAuth() {
     const auth = localStorage.getItem('auth');
@@ -68,7 +64,7 @@ async function loadHistory() {
     }
 }
 
-// Check login
+//Check login
 if (!localStorage.getItem('user')) {
     window.location.href = 'index.html';
 }

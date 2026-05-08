@@ -82,7 +82,7 @@ async function loadSessions() {
     }
 }
 
-// Export single session
+//Export single session
 async function exportSession(sessionId) {
     const format = document.getElementById('exportFormat').value;
     
@@ -103,7 +103,7 @@ async function exportSession(sessionId) {
     }
 }
 
-// Export all sessions
+//Export all sessions
 async function exportAll() {
     const format = document.getElementById('exportFormat').value;
     
@@ -124,7 +124,7 @@ async function exportAll() {
     }
 }
 
-// Download file helper - FIXED FOR TXT
+//Download file helper
 function downloadFile(data, format, filename) {
     let content, extension, mimeType;
     
@@ -133,12 +133,12 @@ function downloadFile(data, format, filename) {
         extension = 'json';
         mimeType = 'application/json';
     } else {
-        // TXT format - human readable
+       
         let text = `MuseChum Chat Export\n`;
         text += `Generated: ${new Date().toLocaleString()}\n`;
         text += `${'='.repeat(50)}\n\n`;
         
-        // Check if we have sessions array (export all)
+       
         if (data.sessions && data.sessions.length > 0) {
             for (const session of data.sessions) {
                 text += `Session: ${new Date(session.started_at).toLocaleString()}\n`;
@@ -157,7 +157,7 @@ function downloadFile(data, format, filename) {
                 text += `\n${'='.repeat(50)}\n\n`;
             }
         }
-        // Check if we have a single session (export single)
+        
         else if (data.messages && data.messages.length > 0) {
             text += `Session: ${new Date(data.started_at).toLocaleString()}\n`;
             text += `Session ID: ${data.session_id}\n`;
@@ -170,7 +170,7 @@ function downloadFile(data, format, filename) {
             }
             text += `\n${'='.repeat(50)}\n`;
         }
-        // Fallback - no data structure recognized
+       
         else {
             text += `No messages found in this export.\n`;
         }
@@ -191,13 +191,13 @@ function downloadFile(data, format, filename) {
     URL.revokeObjectURL(url);
 }
 
-// Confirm delete session
+//Confirm delete session
 function confirmDeleteSession(sessionId) {
     currentSessionToDelete = sessionId;
     document.getElementById('deleteSessionModal').classList.add('active');
 }
 
-// Delete single session
+//Delete single session
 async function deleteSession() {
     if (!currentSessionToDelete) return;
     
@@ -220,7 +220,7 @@ async function deleteSession() {
     currentSessionToDelete = null;
 }
 
-// Delete all sessions
+//Delete all sessions
 async function deleteAllSessions() {
     try {
         const response = await fetch(`${API_URL}/chat/all`, {
@@ -240,7 +240,7 @@ async function deleteAllSessions() {
     }
 }
 
-// Modal handlers
+//Modal handlers
 document.getElementById('exportAllBtn')?.addEventListener('click', exportAll);
 document.getElementById('deleteAllBtn')?.addEventListener('click', () => {
     document.getElementById('deleteAllModal').classList.add('active');
@@ -259,14 +259,14 @@ document.getElementById('cancelAllDelete')?.addEventListener('click', () => {
 
 document.getElementById('confirmAllDelete')?.addEventListener('click', deleteAllSessions);
 
-// Check login and load sessions
+//Check login and load sessions
 if (!isLoggedIn()) {
     window.location.href = 'index.html';
 }
 
 loadSessions();
 
-// Make functions global for onclick handlers
+//Make functions global for onclick handlers
 window.exportSession = exportSession;
 window.confirmDeleteSession = confirmDeleteSession;
 window.deleteSession = deleteSession;

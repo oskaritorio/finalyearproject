@@ -26,9 +26,7 @@ class ChatResponse(BaseModel):
     crisis_help: list | None = None
 
 
-# ============================================
-# WELLBEING HELPER FUNCTIONS
-# ============================================
+#Helper functions to read the wellbeing application
 
 async def get_wellbeing_summary(user_id: str, db: AsyncSession) -> str:
     """Get user's latest wellbeing assessment with full details"""
@@ -71,14 +69,14 @@ async def get_wellbeing_trend(user_id: str, db: AsyncSession) -> str:
     if len(history) < 2:
         return f"You've completed {len(history)} assessment. Take another one to see your progress over time!"
     
-    # Get scores from last 3 assessments
+    #Get scores from last 3 assessments
     scores = []
     dates = []
     for item in history[:3]:
         scores.append(float(item.get('total_score', 0)))
         dates.append(item.get('date', '')[:10])
     
-    # Calculate trend
+    #Calculate trend
     if len(scores) >= 2:
         first = scores[-1]
         last = scores[0]
@@ -153,9 +151,6 @@ async def get_wellbeing_tips(user_id: str, db: AsyncSession) -> str:
     return response
 
 
-# ============================================
-# JOURNAL HELPER FUNCTIONS
-# ============================================
 
 async def get_journal_summary(user_id: str, db: AsyncSession) -> str:
     from app.models.journal import JournalEntry
@@ -171,11 +166,11 @@ async def get_journal_summary(user_id: str, db: AsyncSession) -> str:
     if not entries:
         return "You haven't written any journal entries yet. Would you like to write one now?"
     
-    # Count sentiments
+    #Count sentiments
     sentiments = [e.sentiment_label for e in entries if e.sentiment_label]
     sentiment_counts = Counter(sentiments) if sentiments else {}
     
-    # Calculate average mood
+    #Calculate average mood
     mood_scores = [e.mood_score for e in entries if e.mood_score]
     avg_mood = sum(mood_scores) / len(mood_scores) if mood_scores else 0
     
@@ -190,7 +185,7 @@ async def get_journal_summary(user_id: str, db: AsyncSession) -> str:
             response += f"  {emoji} {label}: {count}\n"
         response += "\n"
     
-    # Latest entry preview
+    #Latest entry preview
     latest = entries[0]
     preview = latest.encrypted_content[:150] + "..." if len(latest.encrypted_content) > 150 else latest.encrypted_content
     response += f"📝 Latest entry:\n{preview}"
@@ -213,7 +208,7 @@ async def analyze_mood_trend(user_id: str, db: AsyncSession) -> str:
     if len(entries) < 3:
         return "You don't have enough journal entries yet to analyse mood trends. Write a few more entries!"
     
-    # Get sentiment scores
+    #Get sentiment scores
     sentiments = [e.sentiment_score for e in entries if e.sentiment_score is not None]
     
     if len(sentiments) >= 6:
@@ -241,9 +236,7 @@ async def analyze_mood_trend(user_id: str, db: AsyncSession) -> str:
     return response
 
 
-# ============================================
-# MAIN CHAT ENDPOINT
-# ============================================
+
 
 @router.post("/", response_model=ChatResponse)
 async def chat(
@@ -253,9 +246,6 @@ async def chat(
 ):
     msg_lower = request.message.lower()
     
-    # ============================================
-    # WELLBEING COMMANDS (Highest priority)
-    # ============================================
     
     if "wellbeing tips" in msg_lower or "wellbeing advice" in msg_lower or "self care tips" in msg_lower:
         tips = await get_wellbeing_tips(current_user.id, db)
@@ -269,30 +259,23 @@ async def chat(
         summary = await get_wellbeing_summary(current_user.id, db)
         return ChatResponse(reply=summary, category="wellbeing_summary", crisis_help=None)
     
-       # ============================================
-    # JOURNAL COMMANDS
-    # ============================================
     
-    # Journal summary - what did I write?
+    #Journal summary
     if any(phrase in msg_lower for phrase in ["what did i write", "show me my journal", "journal summary", "my entries", "summarise my journal", "journal recap"]):
         summary = await get_journal_summary(current_user.id, db)
         return ChatResponse(reply=summary, category="journal_summary", crisis_help=None)
     
-    # Journal trend - how is my journal mood?
+    #Journal trend
     if any(phrase in msg_lower for phrase in ["journal trend", "my journal trend", "what is my journal trend", "how is my journal trend", "journal progress", "am i improving in my journal", "how are my journals"]):
         analysis = await analyze_mood_trend(current_user.id, db)
         return ChatResponse(reply=analysis, category="mood_analysis", crisis_help=None)
     
-    # Simple mood trend (shorter version)
+    #Simple mood trend 
     if any(phrase in msg_lower for phrase in ["how is my mood", "mood trend", "am i getting better", "track my mood"]):
         analysis = await analyze_mood_trend(current_user.id, db)
         return ChatResponse(reply=analysis, category="mood_analysis", crisis_help=None)
     
-    # ============================================
-    # NORMAL CHAT FLOW
-    # ============================================
-    
-    # Find or create session
+    #Find or create session
     result = await db.execute(
         select(ChatSession)
         .where(ChatSession.user_id == current_user.id)
@@ -305,7 +288,7 @@ async def chat(
         db.add(session)
         await db.flush()
     
-    # Get last 5 messages for context
+    #Get last 5 messages for context
     msg_result = await db.execute(
         select(Message)
         .where(Message.session_id == session.id)
@@ -315,7 +298,7 @@ async def chat(
     last_msgs = msg_result.scalars().all()
     context = [{"sender": m.sender, "content": m.content} for m in reversed(last_msgs)]
     
-    # Save user message
+    #Save user message
     user_msg = Message(
         id=str(uuid.uuid4()),
         session_id=session.id,
@@ -324,13 +307,13 @@ async def chat(
     )
     db.add(user_msg)
     
-    # Get reply from chatbot
+    #Get reply from chatbot
     reply_text, category, crisis_help = await chatbot.get_reply(request.message, context)
     
     if category == "CRISIS":
         session.crisis_detected = True
     
-    # Save bot reply
+    #Save bot reply
     bot_msg = Message(
         id=str(uuid.uuid4()),
         session_id=session.id,
@@ -344,16 +327,13 @@ async def chat(
     return ChatResponse(reply=reply_text, category=category, crisis_help=crisis_help)
 
 
-# ============================================
-# HISTORY ENDPOINT
-# ============================================
 
 @router.get("/history")
 async def get_history(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get all chat sessions for the current user"""
+   
     result = await db.execute(
         select(ChatSession)
         .where(ChatSession.user_id == current_user.id)
@@ -381,10 +361,6 @@ async def get_history(
     
     return {"sessions": history}
 
-
-# ============================================
-# EXPORT ENDPOINTS
-# ============================================
 
 @router.get("/export/all")
 async def export_all_sessions(
@@ -472,17 +448,12 @@ async def export_session(
     }
 
 
-# ============================================
-# DELETE ENDPOINTS
-# ============================================
-
 @router.delete("/session/{session_id}")
 async def delete_session(
     session_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Delete a single chat session"""
     result = await db.execute(
         select(ChatSession).where(
             ChatSession.id == session_id,
@@ -505,7 +476,6 @@ async def delete_all_sessions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Delete ALL chat sessions for the current user"""
     result = await db.execute(
         select(ChatSession).where(ChatSession.user_id == current_user.id)
     )

@@ -1,5 +1,5 @@
 
-// Login function
+//Login function
 async function login(username, password) {
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
@@ -28,24 +28,24 @@ async function login(username, password) {
     }
 }
 
-// Logout function
+//Logout function
 function logout() {
     localStorage.clear();
     window.location.href = 'index.html';
 }
 
-// Check if user is logged in
+//Check if user is logged in
 function isLoggedIn() {
     return localStorage.getItem('user') !== null;
 }
 
-// Get current user
+//Get current user
 function getCurrentUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
 }
 
-// Redirect to login if not authenticated
+//Redirect to login if not authenticated
 function requireAuth() {
     if (!isLoggedIn()) {
         window.location.href = '/';

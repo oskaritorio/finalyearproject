@@ -3,7 +3,7 @@ let currentEditId = null;
 let selectedMood = 3;
 let editSelectedMood = 3;
 
-// Create a new journal entry
+//Create a new journal entry
 async function createEntry() {
     const content = document.getElementById('newEntryContent').value;
     if (!content.trim()) {
@@ -48,7 +48,7 @@ async function createEntry() {
     }
 }
 
-// Load all journal entries
+//Load all journal entries
 async function loadEntries() {
     const container = document.getElementById('entriesContainer');
     container.innerHTML = '<div class="loading">Loading...</div>';
@@ -94,7 +94,7 @@ async function loadEntries() {
     }
 }
 
-// Delete an entry
+//Delete an entry
 async function deleteEntry(entryId) {
     if (!confirm('Are you sure you want to delete this entry?')) return;
     
@@ -115,7 +115,7 @@ async function deleteEntry(entryId) {
     }
 }
 
-// Open edit modal
+//Open edit modal
 function openEditModal(id, mood, content) {
     currentEditId = id;
     editSelectedMood = mood;
@@ -125,13 +125,13 @@ function openEditModal(id, mood, content) {
     document.getElementById('editModal').style.display = 'flex';
 }
 
-// Close modal
+//Close modal
 function closeModal() {
     document.getElementById('editModal').style.display = 'none';
     currentEditId = null;
 }
 
-// Update entry
+//Update entry
 async function updateEntry() {
     const content = document.getElementById('editContent').value;
     if (!content.trim()) {
@@ -164,7 +164,7 @@ async function updateEntry() {
     }
 }
 
-// Update mood selector UI
+//Update mood selector UI
 function updateMoodSelector(selectorId, moodValue) {
     const container = document.getElementById(selectorId);
     if (!container) return;
@@ -177,7 +177,7 @@ function updateMoodSelector(selectorId, moodValue) {
     });
 }
 
-// Setup mood selector event listeners
+//Setup mood selector event listeners
 function setupMoodSelector(selectorId, callback) {
     const container = document.getElementById(selectorId);
     if (!container) return;
@@ -191,7 +191,7 @@ function setupMoodSelector(selectorId, callback) {
     });
 }
 
-// Helper functions
+//Helper functions
 function getMoodEmoji(score) {
     const emojis = {1: '😢', 2: '😐', 3: '🙂', 4: '😊', 5: '🤗'};
     return emojis[score] || '🙂';

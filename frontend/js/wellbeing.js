@@ -1,6 +1,3 @@
-// ========================================
-// WELLBEING ASSESSMENT - WITH SCALE LABELS
-// ========================================
 
 let currentQuestions = [];
 let userResponses = {};
@@ -67,7 +64,7 @@ function renderQuestions() {
         </div>
     `;
     
-    // SWEMWBS Questions
+    //SWEMWBS Questions
     if (swemwbsQuestions.length > 0) {
         html += `<div class="card"><h3>General Wellbeing</h3>`;
         for (const q of swemwbsQuestions) {
@@ -76,7 +73,7 @@ function renderQuestions() {
         html += `</div>`;
     }
     
-    // PHQ-2 Questions
+    //PHQ-2 Questions
     if (phq2Questions.length > 0) {
         html += `<div class="card"><h3>How often have you been bothered by...</h3>`;
         for (const q of phq2Questions) {
@@ -87,11 +84,11 @@ function renderQuestions() {
     
     container.innerHTML = html;
     
-    // Show submit section
+
     const submitSection = document.getElementById('submitSection');
     if (submitSection) submitSection.style.display = 'block';
     
-    // Attach event listeners
+
     attachScaleListeners();
 }
 
@@ -134,14 +131,14 @@ function handleScaleClick(event) {
     const questionCard = option.closest('.question-card');
     const questionId = questionCard.getAttribute('data-question-id');
     
-    // Remove selected class from all options in this question
+   
     const allOptionsInCard = questionCard.querySelectorAll('.scale-option');
     allOptionsInCard.forEach(opt => opt.classList.remove('selected'));
     
-    // Add selected class to clicked option
+   
     option.classList.add('selected');
     
-    // Store the response
+  
     userResponses[questionId] = value;
     
     console.log('Answered ' + questionId + ': ' + value);

@@ -139,7 +139,7 @@
 
 
     <script>
-    // Local quote library - works 100% of the time, no network needed
+    //Local quote library
     const quoteLibrary = [
         { q: "You are stronger than you think.", a: "Unknown" },
         { q: "Every day is a new beginning. Take a deep breath.", a: "Unknown" },
@@ -156,9 +156,9 @@
         { q: "One small positive thought can change your whole day.", a: "Zig Ziglar" }
     ];
 
-// Get a random daily quote (changes each day based on date)
+//Get a random daily quote
     function loadDailyQuote() {
-    // Use date to get consistent quote for the whole day
+    
         const today = new Date().toDateString();
         let hash = 0;
         for (let i = 0; i < today.length; i++) {
@@ -172,7 +172,7 @@
         document.querySelector('.quote-author').innerHTML = `— ${quote.a}`;
     }
 
-// Load quote when page loads
+//Load quote when page loads
     loadDailyQuote();
     </script>
 

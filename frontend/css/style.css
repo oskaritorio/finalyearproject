@@ -1,6 +1,5 @@
-/* ========================================
-   MUSE CHUM - WARM & COSY DESIGN
-   ======================================== */
+
+/* CSS code for all the graphical customisations to make it look nice and pleasing */
 
 :root {
     --bg-warm: #FFF8F0;
@@ -29,16 +28,14 @@ body {
     color: var(--text-soft);
 }
 
-/* Smooth container */
+
 .container {
     max-width: 800px;
     margin: 0 auto;
     animation: fadeInUp 0.5s ease-out;
 }
 
-/* ========================================
-   HEADER & NAVIGATION
-   ======================================== */
+
 .header {
     background: var(--card-warm);
     border-radius: 60px;
@@ -99,9 +96,7 @@ body {
     color: var(--accent-terracotta) !important;
 }
 
-/* ========================================
-   CARDS & CONTAINERS
-   ======================================== */
+
 .card, .create-card, .entries-list, .mood-stats, .mood-list, .chat-container {
     background: var(--card-warm);
     border-radius: 32px;
@@ -267,9 +262,7 @@ body {
     50% { transform: scale(1.2); }
 }
 
-/* ========================================
-   BUTTONS
-   ======================================== */
+
 button, .save-btn, .btn-chat {
     background: linear-gradient(135deg, var(--accent-sage) 0%, #8BAF78 100%);
     color: white;
@@ -294,7 +287,7 @@ button, .save-btn, .btn-chat {
     text-decoration: none;
 }
 
-/* Bot message links have darker text */
+
 .message.bot .message-content a {
     color: #6B8F5E;
 }
@@ -663,7 +656,7 @@ textarea {
     }
 }
 
-/* Gentle pulse for mood buttons */
+
 @keyframes gentlePulse {
     0% {
         box-shadow: 0 0 0 0 rgba(156, 175, 136, 0.4);
@@ -684,9 +677,7 @@ textarea {
     background: var(--accent-terracotta);
 }
 
-/* ========================================
-   ANIMATIONS
-   ======================================== */
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -727,9 +718,6 @@ textarea {
     }
 }
 
-/* ========================================
-   SCROLLBAR (Cosy touch)
-   ======================================== */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -748,9 +736,7 @@ textarea {
     background: #8BAF78;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
+
 @media (max-width: 600px) {
     body {
         padding: 12px;

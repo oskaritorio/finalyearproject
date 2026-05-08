@@ -9,7 +9,7 @@ from typing import Dict, List
 
 class SentimentAnalyzer:
     
-    # Positive words
+    #Positive words
     positive_words = [
         "happy", "good", "great", "awesome", "wonderful", "excellent", 
         "amazing", "fantastic", "love", "enjoy", "blessed", "grateful",
@@ -18,7 +18,7 @@ class SentimentAnalyzer:
         "joy", "delighted", "wonderful", "terrific", "pleased"
     ]
     
-    # Negative words
+    #Negative words
     negative_words = [
         "sad", "bad", "terrible", "awful", "horrible", "depressed", 
         "anxious", "stressed", "angry", "frustrated", "hurt", "pain",
@@ -65,7 +65,7 @@ class SentimentAnalyzer:
             label = "neutral"
             emoji = "😐"
         
-        # Extract key phrases
+        #Extract key phrases
         key_phrases = []
         for word in SentimentAnalyzer.positive_words:
             if word in text_lower and word not in key_phrases:

@@ -151,7 +151,7 @@
             window.location.href = 'index.html';
         }
         
-        // Setup mood selector - simple click handler
+        //Setup mood selector - simple click handler
         const moodOptions = document.querySelectorAll('.mood-option');
         
         function clearMoodSelection() {
@@ -167,7 +167,7 @@
             });
         });
         
-        // Save entry
+        //Save entry
         async function saveEntry() {
             const content = document.getElementById('journalContent').value;
             
@@ -218,7 +218,7 @@
             }
         }
         
-        // Load entries - SIMPLE DISPLAY
+        //Load entries
         async function loadEntries() {
             const container = document.getElementById('entriesList');
             container.innerHTML = 'Loading...';
@@ -272,7 +272,7 @@
             }
         }
         
-        // Delete entry
+        //Delete entry
         window.deleteEntry = async function(id) {
             if (!confirm('Delete this entry?')) return;
             

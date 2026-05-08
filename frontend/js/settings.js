@@ -10,21 +10,21 @@ function getCurrentUser() {
     return user ? JSON.parse(user) : null;
 }
 
-// Display user info with formatted date
+//Display user info with formatted date
 async function loadUserInfo() {
     const usernameSpan = document.getElementById('username');
     const memberSinceSpan = document.getElementById('memberSince');
     
-    // Get username from localStorage
+    //Get username from localStorage
     const localUser = getCurrentUser();
     if (localUser && localUser.username) {
         usernameSpan.textContent = localUser.username;
     }
     
-    // Just show a friendly message instead of trying to fetch date
+   
     memberSinceSpan.textContent = 'Member';
     
-    // Optional: Try to fetch from backend but don't worry if it fails
+
     try {
         const response = await fetch(`${API_URL}/user/me`, {
             headers: getAuth()
@@ -48,7 +48,7 @@ async function loadUserInfo() {
     }
 }
 
-// Delete account function
+
 async function deleteAccount() {
     try {
         const response = await fetch(`${API_URL}/user/`, {
@@ -74,7 +74,7 @@ async function deleteAccount() {
     }
 }
 
-// Modal handling
+//Modal handling
 const modal = document.getElementById('deleteModal');
 const deleteBtn = document.getElementById('deleteAccountBtn');
 const cancelBtn = document.getElementById('cancelDeleteBtn');
@@ -99,14 +99,14 @@ if (confirmBtn) {
     });
 }
 
-// Close modal if clicking outside
+//Close modal if clicking outside
 window.addEventListener('click', (e) => {
     if (e.target === modal) {
         modal.classList.remove('active');
     }
 });
 
-// Manage Chats button
+//Manage Chats button
 const manageChatsBtn = document.getElementById('manageChatsBtn');
 if (manageChatsBtn) {
     manageChatsBtn.addEventListener('click', () => {
@@ -119,10 +119,10 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// Check if user is logged in
+//Check if user is logged in
 if (!localStorage.getItem('user')) {
     window.location.href = 'index.html';
 }
 
-// Load user info on page load
+//Load user info on page load
 loadUserInfo();

@@ -14,7 +14,7 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 
-# QUESTION DEFINITIONS
+#QUESTION DEFINITIONS
 
 
 SWEMWBS_QUESTIONS = [
@@ -104,10 +104,10 @@ class WellbeingService:
         tips = WellbeingService.load_tips()
         selected_tips = []
         
-        # Process responses to get flipped scores for low score detection
+        #Process responses to get flipped scores for low score detection
         processed = process_responses(responses)
         
-        # Add general category tips
+        #Add general category tips
         category_lower = category.lower()
         for tip in tips:
             if tip['category'] == 'general' and tip['question_focus'] == category_lower:
@@ -115,7 +115,7 @@ class WellbeingService:
                     selected_tips.append(tip['tip'])
                     break
         
-        # Add question-specific tips for low scores (1-2) on flipped scores
+        #Add question-specific tips for low scores (1-2) on flipped scores
         question_mapping = {
             'q1_optimistic': 'optimistic',
             'q2_useful': 'useful', 
@@ -138,13 +138,13 @@ class WellbeingService:
                             selected_tips.append(tip['tip'])
                             break
         
-        # Remove duplicates and limit to 5 tips
+        #Remove duplicates and limit to 5 tips
         return list(dict.fromkeys(selected_tips))[:5]
     
     @staticmethod
     def save_assessment(user_id: str, responses: Dict, total_score: float, category: str, tips: List[str]) -> bool:
         
-        # Process responses to flip negative questions for storage
+        #Process responses to flip negative questions for storage
         processed = process_responses(responses)
         
         row = {

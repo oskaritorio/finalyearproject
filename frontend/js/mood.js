@@ -1,7 +1,3 @@
-// ========================================
-// MOOD FUNCTIONS
-// ========================================
-
 async function quickMood(score) {
     try {
         const response = await fetch(`${API_URL}/mood/`, {

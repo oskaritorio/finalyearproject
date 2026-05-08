@@ -25,7 +25,7 @@ class Chat:
         ]
         
        
-        # MEMORY
+        #MEMORY
        
         self.user_name = None
         self.last_topic = None
@@ -33,7 +33,7 @@ class Chat:
         self.conversation_topics = []
         
        
-        # ACTIVITIES FOR BOREDOM / FREE TIME
+        #ACTIVITIES FOR BOREDOM / FREE TIME
         
         self.boredom_activities = [
             "Try reading a book: <a href='https://www.gutenberg.org/' target='_blank'>Free eBooks from Project Gutenberg</a>",
@@ -46,9 +46,7 @@ class Chat:
             "Try cooking something new - here's <a href='https://www.bbcgoodfood.com/' target='_blank'>BBC Good Food</a> for recipes"
         ]
         
-        # ============================================
-        # KINDNESS ACTIVITIES
-        # ============================================
+      
         self.kindness_activities = [
             "Send a thoughtful message to a friend or family member",
             "Do a small favour for someone without being asked",
@@ -62,9 +60,7 @@ class Chat:
             "Listen to someone who needs to talk"
         ]
         
-        # ============================================
-        # HAPPINESS / MOOD-BOOSTING ACTIVITIES
-        # ============================================
+       
         self.happiness_activities = [
             "Listen to uplifting music: <a href='https://open.spotify.com/playlist/37i9dQZF1DX3Ogo9pFvBkY' target='_blank'>Spotify Happy Playlist</a>",
             "Watch something funny: <a href='https://www.youtube.com/results?search_query=funny+cats' target='_blank'>Funny Videos</a>",
@@ -76,9 +72,7 @@ class Chat:
             "Read something uplifting: <a href='https://www.shortstoryguide.com/uplifting-short-stories/' target='_blank'>Uplifting Short Stories</a>"
         ]
         
-        # ============================================
-        # SELF-CARE ACTIVITIES
-        # ============================================
+     
         self.self_care_activities = [
             "Take a 10-minute break from screens",
             "Make yourself a warm drink and sit quietly",
@@ -89,10 +83,7 @@ class Chat:
             "Drink a glass of water - staying hydrated helps mood",
             "Write down one thing you achieved today, no matter how small"
         ]
-        
-        # ============================================
-        # GREETING RESPONSES
-        # ============================================
+    
         self.greeting_responses = [
             "Hey there. How are you doing today?",
             "Hi. Good to see you. What's on your mind?",
@@ -104,9 +95,7 @@ class Chat:
             "Hi. I'm glad you're here. What would you like to talk about?"
         ]
         
-        # ============================================
-        # "HOW ARE YOU?" RESPONSES
-        # ============================================
+ 
         self.how_are_you_responses = [
             "I'm doing alright, thanks for asking. But more importantly, how are YOU feeling?",
             "I'm here to listen to you. What's been going on in your world?",
@@ -116,9 +105,7 @@ class Chat:
             "I'm doing well. What would be most helpful for us to talk about?"
         ]
         
-        # ============================================
-        # GOOD/OKAY RESPONSES
-        # ============================================
+       
         self.good_responses = [
             "That's good to hear. Anything specific making today a good day?",
             "Glad to hear that. What's been going well for you?",
@@ -130,9 +117,7 @@ class Chat:
             "I'm glad you're doing well. Anything you want to celebrate?"
         ]
         
-        # ============================================
-        # BOREDOM RESPONSES
-        # ============================================
+   
         self.boredom_responses = [
             "Feeling bored? Here are some things you could try:",
             "I can suggest some activities if you're looking for something to do:",
@@ -140,9 +125,7 @@ class Chat:
             "Looking for something to do? Try one of these:"
         ]
         
-        # ============================================
-        # JOB RESPONSES (with helpful links)
-        # ============================================
+
         self.job_responses = [
             "Looking for jobs can be really stressful. Here are some helpful resources:\n• <a href='https://www.indeed.co.uk' target='_blank'>Indeed - Job Search</a>\n• <a href='https://www.gov.uk/jobsearch' target='_blank'>Gov.uk Job Search</a>\n• <a href='https://www.totaljobs.com' target='_blank'>TotalJobs</a>\n\nWhat kind of work are you looking for?",
             "Job hunting is tough. Try these sites:\n• <a href='https://www.linkedin.com/jobs/' target='_blank'>LinkedIn Jobs</a>\n• <a href='https://www.reed.co.uk' target='_blank'>Reed</a>\n• <a href='https://www.glassdoor.co.uk' target='_blank'>Glassdoor</a>\n\nWhat areas are you interested in?",
@@ -154,9 +137,7 @@ class Chat:
             "The job market is tough right now. <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/work/' target='_blank'>Mind's Work & Mental Health Guide</a> might help.\n\nHow are you coping with it?",
         ]
         
-        # ============================================
-        # MONEY RESPONSES (with financial support links)
-        # ============================================
+   
         self.money_responses = [
             "Money stress is really hard. Here are some resources that might help:\n• <a href='https://www.citizensadvice.org.uk/debt-and-money/' target='_blank'>Citizens Advice - Money Help</a>\n• <a href='https://www.moneyhelper.org.uk/en' target='_blank'>Money Helper (Government)</a>\n• <a href='https://www.stepchange.org' target='_blank'>StepChange Debt Charity</a>\n\nHave you looked into any financial support options?",
             "I hear you about needing money. <a href='https://www.entitledto.co.uk' target='_blank'>EntitledTo - Benefits Calculator</a> can show what you might be eligible for.\n\nWhat kind of work would you ideally want?",
@@ -167,9 +148,7 @@ class Chat:
             "Have you looked into student support or hardship funds? Many universities offer <a href='https://www.gov.uk/student-finance' target='_blank'>hardship grants</a>.\n\nWould you like me to help you explore options?",
         ]
         
-        # ============================================
-        # COURSEWORK/EDUCATION RESPONSES
-        # ============================================
+  
         self.coursework_responses = [
             "Coursework can be overwhelming. Here are some study resources:\n• <a href='https://www.bbc.co.uk/bitesize' target='_blank'>BBC Bitesize</a>\n• <a href='https://www.khanacademy.org' target='_blank'>Khan Academy</a>\n• <a href='https://www.quizlet.com' target='_blank'>Quizlet - Study Tools</a>\n\nHow are you managing it all?",
             "Balancing coursework is tough. Try the <a href='https://todoist.com' target='_blank'>Todoist</a> app for organising deadlines.\n\nWhat's your heaviest subject right now?",
@@ -180,10 +159,7 @@ class Chat:
             "How do you usually manage when coursework gets overwhelming?\n\nTry <a href='https://www.notion.so' target='_blank'>Notion</a> for organising notes and deadlines.",
             "Is there a particular assignment that's worrying you?\n\n<a href='https://www.thestudyspace.com' target='_blank'>The Study Space</a> offers free study tips and motivation.",
         ]
-        
-        # ============================================
-        # SADNESS RESPONSES
-        # ============================================
+      
         self.sad_responses = [
             "I'm sorry to hear that. Want to tell me what happened?",
             "That sounds really hard. I'm here to listen if you want to share.",
@@ -196,9 +172,7 @@ class Chat:
             "Would you like me to suggest something that might help lift your mood?"
         ]
         
-        # ============================================
-        # ANXIETY RESPONSES
-        # ============================================
+    
         self.anxious_responses = [
             "Anxiety can feel overwhelming. Would you like to try a breathing exercise? <a href='https://www.calm.com/breathe' target='_blank'>Calm Breathing Exercise</a>",
             "I hear you're feeling worried. The <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank'>NHS stress guide</a> has some helpful techniques.",
@@ -209,9 +183,7 @@ class Chat:
             "Would it help to talk about what's specifically worrying you right now?"
         ]
         
-        # ============================================
-        # STORY RESPONSES
-        # ============================================
+   
         self.story_responses = [
             "Wow, that sounds really difficult. How are you feeling about it now?",
             "I see. That must have been hard to go through. Want to talk more about it?",
@@ -223,9 +195,7 @@ class Chat:
             "I really appreciate you sharing that. What would support look like for you right now?"
         ]
         
-        # ============================================
-        # NAME RECOGNITION RESPONSES
-        # ============================================
+   
         self.name_responses = [
             "Nice to meet you, {name}. What's been on your mind?",
             "Hi {name}, good to properly meet you. I'm here for you.",
@@ -235,9 +205,7 @@ class Chat:
             "Hi {name}. I'm glad you're here. What's on your mind today?"
         ]
         
-        # ============================================
-        # FOLLOW-UP RESPONSES
-        # ============================================
+ 
         self.followup_responses = [
             "So you mentioned {topic}. Tell me more about that.",
             "Thanks for sharing about {topic}. How's that going for you?",
@@ -249,9 +217,7 @@ class Chat:
             "You brought up {topic} before. Has anything changed since then?"
         ]
         
-        # ============================================
-        # DEFAULT RESPONSES
-        # ============================================
+     
         self.default_responses = [
             "I hear you. Want to tell me more about that?",
             "That sounds important. How does that make you feel?",
@@ -265,18 +231,13 @@ class Chat:
             "That sounds really important. What do you need most right now?"
         ]
         
-        # ============================================
-        # REFERENCE PHRASES
-        # ============================================
+    
         self.reference_phrases = [
             "just that", "like i said", "as i mentioned", "already told you",
             "i said", "remember", "that thing", "what i said", "you know",
             "like i was saying", "as i was saying"
         ]
 
-        # ============================================
-        # JOB/MONEY SUPPORT SITES
-        # ============================================
         self.job_support_sites = [
             "Here are some job support websites:\n\n• <a href='https://www.indeed.co.uk' target='_blank'>Indeed</a> - Largest job board\n• <a href='https://www.linkedin.com/jobs/' target='_blank'>LinkedIn Jobs</a> - Network and apply\n• <a href='https://www.totaljobs.com' target='_blank'>TotalJobs</a>\n• <a href='https://www.reed.co.uk' target='_blank'>Reed</a>\n• <a href='https://www.gov.uk/jobsearch' target='_blank'>Gov.uk Job Search</a>\n\nWould you like help with CV writing or interview tips?",
         ]
@@ -289,9 +250,7 @@ class Chat:
             "Here are some stress management techniques:\n\n• <a href='https://www.calm.com/breathe' target='_blank'>5-Minute Breathing Exercise</a>\n• <a href='https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/stress-busting-techniques/' target='_blank'>NHS Stress-Busting Guide</a>\n• <a href='https://www.mind.org.uk/information-support/tips-for-everyday-living/stress/' target='_blank'>Mind's Stress Guide</a>\n• Try the 5-4-3-2-1 grounding technique: Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste",
         ]
 
-        # ============================================
-        # KEYWORD DETECTION LISTS
-        # ============================================
+      
         self.boredom_keywords = ["bored", "nothing to do", "free time", "what to do", "any ideas", "suggest something"]
         self.kindness_keywords = ["kind", "kindness", "nice thing", "good deed", "help someone"]
         self.happiness_keywords = ["happier", "feel better", "cheer up", "boost mood", "feel good", "happy"]
@@ -312,9 +271,7 @@ class Chat:
         self.money_support_keywords = ["money support", "financial help", "money help", "benefits", "financial support"]
         self.stress_keywords = ["stress tips", "manage stress", "stress management", "calm down"]
 
-    # ============================================
-    # HELPER METHODS
-    # ============================================
+ 
     
     def extract_topics(self, message: str) -> List[str]:
         topics = []
@@ -386,9 +343,7 @@ class Chat:
             return f"Here's a self-care idea:\n\n• {activity}\n\nTaking care of yourself is important."
         return None
 
-    # ============================================
-    # JOURNAL METHODS
-    # ============================================
+
     
     async def get_journal_summary(self, user_id: str, db) -> str:
         from app.models.journal import JournalEntry
@@ -466,7 +421,7 @@ class Chat:
         return response
 
     
-    # WELLBEING ASSESSMENT METHODS
+
     
     
     
@@ -607,12 +562,12 @@ class Chat:
         return response
 
    
-    # MAIN GET_REPLY METHOD - THIS IS WHAT YOUR CHAT.PY CALLS
+
     
     
     async def get_reply(self, message: str, last_messages: List[Dict] = None) -> Tuple[str, str, Optional[List[str]]]:
     
-    # SAFETY FIRST - Crisis detection
+
     
         if self.is_crisis(message):
             return (
@@ -627,7 +582,7 @@ class Chat:
         msg_lower = message.lower()
     
     
-    # JOURNAL COMMANDS - CHECK SECOND
+
     
         if any(phrase in msg_lower for phrase in self.journal_summary_keywords):
             return "📊 I can see your journal entries. Please ask this question from the main chat interface.", "journal_summary", None
@@ -636,7 +591,7 @@ class Chat:
             return "📈 I can analyse your mood trend. Please ask this question from the main chat interface.", "mood_analysis", None
     
     
-    # EXTRACT AND STORE NAME
+    #EXTRACT AND STORE NAME
     
         name = self.extract_name(message)
         if name and not self.user_name:
@@ -644,7 +599,7 @@ class Chat:
             return random.choice(self.name_responses).format(name=name), "name", None
     
    
-    # GREETINGS
+    #GREETINGS
    
         greetings = ["hi", "hello", "hey", "hi there", "hello there", "good morning", "good afternoon", "good evening"]
         if any(msg_lower.startswith(greet) for greet in greetings):
@@ -653,20 +608,20 @@ class Chat:
             return random.choice(self.greeting_responses), "greeting", None
     
     
-    # "HOW ARE YOU?"
+  
     
         if "how are you" in msg_lower or "how are you doing" in msg_lower:
             return random.choice(self.how_are_you_responses), "how_are_you", None
     
    
-    # "I'M GOOD" responses
+
     
         good_phrases = ["i'm good", "im good", "i am good", "doing good", "doing well", "i'm okay", "im okay"]
         if any(phrase in msg_lower for phrase in good_phrases):
             return random.choice(self.good_responses), "good", None
     
    
-    #JOB/MONEY/STRESS SUPPORT 
+
    
         if any(phrase in msg_lower for phrase in self.job_support_keywords):
             self.last_topic = "job support"
@@ -681,7 +636,7 @@ class Chat:
             return random.choice(self.stress_management_tips), "stress_tips", None
     
     
-    #BOREDOM/KINDNESS/HAPPINESS DETECTION
+
     
         if any(word in msg_lower for word in self.boredom_keywords):
             self.last_topic = "activities to do"
@@ -696,7 +651,7 @@ class Chat:
             return self.get_activity_suggestions("happiness"), "happiness", None
     
   
-    # If user asks a question, reset the last_topic to avoid being stuck
+    #If user asks a question
         if "?" in message or any(word in msg_lower for word in ["what", "how", "why", "when", "where", "who"]):
             self.last_topic = None
     

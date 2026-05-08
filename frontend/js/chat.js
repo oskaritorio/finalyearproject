@@ -15,7 +15,7 @@ function addMessage(text, sender) {
     container.appendChild(msgDiv);
     container.scrollTop = container.scrollHeight;
     
-    // Store in context
+    //Store in context
     conversationContext.push({ sender: sender, message: text });
     if (conversationContext.length > 10) conversationContext.shift();
 }
@@ -35,7 +35,7 @@ async function sendMessage() {
     addMessage(message, 'user');
     input.value = '';
     
-    // Check if user mentions their name
+    //Check if user mentions their name
     const nameMatch = message.match(/my name is (\w+)|i'm (\w+)|i am (\w+)/i);
     if (nameMatch) {
         userName = nameMatch[1] || nameMatch[2] || nameMatch[3];
@@ -55,7 +55,7 @@ async function sendMessage() {
             const data = await response.json();
             let reply = data.reply;
             
-            // Inject user name if known and not already in reply
+            //Inject user name if known and not already in reply
             if (userName && !reply.includes(userName) && Math.random() > 0.7) {
                 reply = `${userName}, ${reply.toLowerCase()}`;
             }
@@ -84,12 +84,12 @@ function initChat() {
         window.location.href = 'index.html';
     }
     
-    // Try to get user name from stored user data
+    //Try to get user name from stored user data
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user.username) {
         userName = user.username;
     }
 }
 
-// Make functions global
+//Make functions global
 window.sendMessage = sendMessage;

@@ -1,4 +1,4 @@
-// Toast notification system - replaces all alert boxes
+
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -9,17 +9,15 @@ function showToast(message, type = 'success') {
     `;
     document.body.appendChild(toast);
     
-    // Auto-remove after 3 seconds
+    //Auto-remove after 3 seconds
     setTimeout(() => {
         toast.classList.add('fade-out');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
     
-    // Close button
+    //Close button
     toast.querySelector('.toast-close').addEventListener('click', () => {
         toast.remove();
     });
 }
 
-// Replace all alert() calls with showToast()
-// Example: alert('Entry saved!') → showToast('Entry saved!', 'success')

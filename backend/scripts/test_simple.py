@@ -12,13 +12,12 @@ sys.path.append(str(Path(__file__).parent.parent))
 from app.models.base import AsyncSessionLocal
 
 async def test_connection():
-    """Test database connection"""
     async with AsyncSessionLocal() as session:
         result = await session.execute(text("SELECT 1"))
         value = result.scalar()
         print(f"✅ Database connection test: {value}")
         
-        # List tables
+        #List tables
         result = await session.execute(
             text("SELECT name FROM sqlite_master WHERE type='table'")
         )

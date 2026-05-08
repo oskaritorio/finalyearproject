@@ -10,19 +10,18 @@ from app.models.base import engine, Base
 from app.models import User, JournalEntry
 
 async def init_db():
-    """Create all tables"""
     print("🚀 Creating database tables...")
     
-    # Create data directory
+    #Create data directory
     os.makedirs("/app/data", exist_ok=True)
     
-    # Create tables
+    #Create tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
     print("✅ Tables created successfully!")
     
-    # List tables
+    #List tables
     async with engine.connect() as conn:
         result = await conn.execute(
             text("SELECT name FROM sqlite_master WHERE type='table'")

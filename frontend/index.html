@@ -105,7 +105,7 @@
     <script>
         const API_URL = 'http://localhost:8000';
         
-        // Get DOM elements
+        //Get DOM elements
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const loginBtn = document.getElementById('loginBtn');
@@ -161,15 +161,15 @@
             }
         }
         
-        // Press Enter to login
+        //Press Enter to login
         passwordInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleLogin();
         });
         
-        // Button click
+        //Button click
         loginBtn.addEventListener('click', handleLogin);
         
-        // Check if already logged in
+        //Check if already logged in
         if (localStorage.getItem('user')) {
             window.location.href = 'dashboard.html';
         }
